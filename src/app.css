@@ -1,0 +1,21 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink: #0e0f11;
+  --color-paper: #fbfbf9;
+  --color-accent: #1c6f4a;
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    --color-paper: #0e0f11;
+    --color-ink: #f2f2ef;
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+}
