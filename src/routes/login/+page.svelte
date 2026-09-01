@@ -1,36 +1,46 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
-  let { form } = $props();
+	import { enhance } from '$app/forms';
+	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
+	import * as Card from '$lib/components/ui/card';
+
+	let { form } = $props();
 </script>
 
-<h1 class="text-2xl font-semibold">Entra</h1>
-<p class="mt-2 text-sm opacity-70">Trova le conversazioni dove hai qualcosa da dire.</p>
+<div class="flex min-h-[70svh] items-center">
+	<Card.Root class="w-full">
+		<Card.Header>
+			<Card.Title>Entra</Card.Title>
+			<Card.Description>Trova le conversazioni dove hai qualcosa da dire.</Card.Description>
+		</Card.Header>
 
-<form method="POST" use:enhance class="mt-6 flex flex-col gap-3">
-  <input
-    name="email"
-    type="email"
-    required
-    autocomplete="email"
-    placeholder="tu@esempio.com"
-    value={form?.email ?? ''}
-    class="rounded border border-black/15 bg-transparent px-3 py-2"
-  />
-  <input
-    name="password"
-    type="password"
-    required
-    autocomplete="current-password"
-    placeholder="password"
-    class="rounded border border-black/15 bg-transparent px-3 py-2"
-  />
+		<Card.Content>
+			<form method="POST" use:enhance class="flex flex-col gap-4">
+				<Input
+					name="email"
+					type="email"
+					required
+					autocomplete="email"
+					placeholder="tu@esempio.com"
+					value={form?.email ?? ''}
+				/>
+				<Input
+					name="password"
+					type="password"
+					required
+					autocomplete="current-password"
+					placeholder="password"
+				/>
 
-  {#if form?.error}
-    <p class="text-sm text-red-600">{form.error}</p>
-  {/if}
+				{#if form?.error}
+					<p class="text-destructive text-sm">{form.error}</p>
+				{/if}
 
-  <div class="flex gap-2">
-    <button formaction="?/login" class="rounded bg-[var(--color-accent)] px-4 py-2 text-white">Entra</button>
-    <button formaction="?/signup" class="rounded border border-black/15 px-4 py-2">Crea un account</button>
-  </div>
-</form>
+				<div class="flex gap-2">
+					<Button type="submit" formaction="?/login">Entra</Button>
+					<Button type="submit" formaction="?/signup" variant="outline">Crea un account</Button>
+				</div>
+			</form>
+		</Card.Content>
+	</Card.Root>
+</div>

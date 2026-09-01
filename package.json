@@ -15,12 +15,19 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "test:unit": "vitest run",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:keys": "supabase status -o env",
     "core:pull": "git subtree pull --prefix=packages/leads-core https://github.com/anomaliaso/anomalia.git leads-core-dist --squash"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.46.1",
-    "ai": "^7.0.87"
+    "ai": "^7.0.87",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0",
+    "tailwind-variants": "^3.3.1"
   },
   "devDependencies": {
     "@sveltejs/adapter-vercel": "^6.3.4",
@@ -28,6 +35,8 @@
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@tailwindcss/vite": "^4.3.1",
     "@types/node": "^26.4.0",
+    "shadcn-svelte": "^1.5.1",
+    "supabase": "^2.116.0",
     "svelte": "^5.56.1",
     "svelte-check": "^4.6.0",
     "tailwindcss": "^4.3.1",
