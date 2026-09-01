@@ -9,5 +9,13 @@ The directory `packages/leads-core/` is maintained upstream in that
 repository and is mirrored here with `git subtree`. Changes to it should
 be made upstream and pulled in, so the two products do not diverge:
 
-    git subtree pull --prefix=packages/leads-core \
-      https://github.com/anomaliaso/anomalia.git dev --squash
+    npm run core:pull
+
+The upstream branch is `leads-core-dist`, which carries the package
+alone. It is produced from the anomalia repository with:
+
+    git subtree split --prefix=packages/leads-core -b leads-core-dist
+    git push origin leads-core-dist
+
+That split has to be re-run upstream whenever the package changes: a
+plain branch does not follow a subdirectory on its own.
