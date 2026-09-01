@@ -1,0 +1,13 @@
+anomalia-leads
+Copyright 2026 Anomalia
+
+This product includes software developed as part of Anomalia
+(https://github.com/anomaliaso/anomalia), licensed under the Apache
+License, Version 2.0.
+
+The directory `packages/leads-core/` is maintained upstream in that
+repository and is mirrored here with `git subtree`. Changes to it should
+be made upstream and pulled in, so the two products do not diverge:
+
+    git subtree pull --prefix=packages/leads-core \
+      https://github.com/anomaliaso/anomalia.git dev --squash
