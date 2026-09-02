@@ -3,6 +3,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import * as Card from '$lib/components/ui/card';
 	import BrandMark from '$lib/components/BrandMark.svelte';
+	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { PLANS } from '$lib/plans';
 
 	const STEPS = [
@@ -52,6 +53,7 @@
 		</a>
 		<div class="flex items-center gap-1">
 			<Button href="#pricing" variant="ghost" size="sm">Pricing</Button>
+			<ThemeToggle />
 			<Button
 				href="https://github.com/anomaliaso/anomalia-leads"
 				variant="ghost"

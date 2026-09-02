@@ -1,13 +1,24 @@
 <!doctype html>
-<html lang="it">
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
 		<script>
-			// Prima della prima pittura, così il tema non lampeggia.
-			if (window.matchMedia('(prefers-color-scheme: dark)').matches)
-				document.documentElement.classList.add('dark');
+			// Deve girare PRIMA della prima pittura, o il tema lampeggia: il server non sa cosa
+			// preferisce questo browser, quindi la decisione si prende qui e subito.
+			//
+			// Nessuna scelta salvata = si segue il sistema. Una scelta salvata vince sempre: chi ha
+			// premuto il pulsante ha detto cosa vuole, e il sistema non deve contraddirlo.
+			try {
+				const saved = localStorage.getItem('theme');
+				const dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+				document.documentElement.classList.toggle('dark', dark);
+			} catch {
+				// localStorage negato (finestra privata, cookie bloccati): si resta sul sistema.
+				if (matchMedia('(prefers-color-scheme: dark)').matches)
+					document.documentElement.classList.add('dark');
+			}
 		</script>
 		%sveltekit.head%
 	</head>

@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
+	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
 	let { data, children } = $props();
 
@@ -57,9 +58,13 @@
 			{/each}
 		</nav>
 
-		<form method="POST" action="/logout" class="ml-auto">
-			<Button type="submit" variant="ghost" size="sm" class="text-muted-foreground">sign out</Button>
-		</form>
+		<div class="ml-auto flex items-center gap-1">
+			<ThemeToggle />
+
+			<form method="POST" action="/logout">
+				<Button type="submit" variant="ghost" size="sm" class="text-muted-foreground">sign out</Button>
+			</form>
+		</div>
 	</div>
 </div>
 
