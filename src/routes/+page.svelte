@@ -52,6 +52,17 @@
 		</a>
 		<div class="flex items-center gap-1">
 			<Button href="#pricing" variant="ghost" size="sm">Pricing</Button>
+			<Button
+				href="https://github.com/anomaliaso/anomalia-leads"
+				variant="ghost"
+				size="sm"
+				aria-label="Source on GitHub"
+				class="px-2"
+			>
+				<svg viewBox="0 0 24 24" fill="currentColor" class="size-4" aria-hidden="true">
+					<path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2 0-.4-.5-1.6.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3" />
+				</svg>
+			</Button>
 			<Button href="/login" size="sm">Sign in</Button>
 		</div>
 	</div>
@@ -84,33 +95,60 @@
 			</p>
 		</div>
 
-		<Card.Root class="shadow-sm">
-			<Card.Header>
-				<div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-					<Badge>buying now</Badge>
-					<span class="text-muted-foreground text-xs">r/smallbusiness</span>
-					<span class="text-muted-foreground/60 text-xs">·</span>
-					<span class="text-muted-foreground text-xs">relevance 88</span>
-					<span class="text-muted-foreground/60 text-xs">·</span>
+		<!-- Il mockup mostra due cose, non una: il thread di qualcun altro e la nostra risposta.
+		     Con la sola bozza non si capisce che È una risposta, e si perde tutto l'argomento. -->
+		<div class="relative">
+			<div class="bg-primary/[0.07] absolute -inset-3 rounded-2xl" aria-hidden="true"></div>
+
+			<Card.Root class="relative gap-0 overflow-hidden py-0 shadow-lg">
+				<div class="border-border flex items-center gap-2.5 border-b px-5 py-3">
+					<span
+						class="bg-foreground/[0.07] text-muted-foreground grid size-6 shrink-0 place-items-center rounded-full text-[10px] font-semibold"
+					>
+						r/
+					</span>
+					<span class="text-sm font-medium">smallbusiness</span>
 					<span class="text-muted-foreground text-xs">2 h ago</span>
+					<Badge class="ml-auto">buying now</Badge>
 				</div>
-				<Card.Title class="text-base leading-snug">
-					Any tool to stop chasing patients for appointment reminders?
-				</Card.Title>
-			</Card.Header>
-			<Card.Content>
-				<p class="bg-muted text-foreground rounded-md p-4 text-sm leading-relaxed whitespace-pre-wrap">
-					We ran the same manual chase for two years. What actually moved the needle wasn't the
-					reminder tool itself — it was sending them 48h out instead of 24h, which cut no-shows
-					roughly in half before we automated anything. If you do want it off your plate,
-					disclosure: I work on one at example.com — but fix the timing first, it's free.
-				</p>
-			</Card.Content>
-			<Card.Footer class="gap-2">
-				<Button size="sm">copy the comment</Button>
-				<Button size="sm" variant="outline">I posted it</Button>
-			</Card.Footer>
-		</Card.Root>
+
+				<div class="space-y-5 p-5">
+					<div>
+						<p class="text-muted-foreground mb-2 text-xs">u/marcus_dds asked</p>
+						<div class="border-border rounded-lg border p-3.5">
+							<p class="text-sm leading-snug font-medium">
+								Any tool to stop chasing patients for appointment reminders?
+							</p>
+							<p class="text-muted-foreground mt-2 text-sm leading-relaxed">
+								Three-chair practice, two front-desk staff. We lose half of Monday to the phone and
+								still get no-shows. Is there something that just handles it?
+							</p>
+						</div>
+					</div>
+
+					<div>
+						<div class="mb-2 flex items-baseline justify-between gap-3">
+							<p class="text-xs font-medium">Your reply, ready to paste</p>
+							<span class="text-muted-foreground text-xs">relevance 88</span>
+						</div>
+						<div class="border-foreground/25 bg-muted/60 rounded-lg border-l-2 p-3.5">
+							<p class="text-sm leading-relaxed">
+								We ran the same manual chase for two years. What actually moved the needle wasn't the
+								reminder tool itself — it was sending them 48h out instead of 24h, which cut no-shows
+								roughly in half before we automated anything. If you do want it off your plate,
+								disclosure: I work on one at example.com — but fix the timing first, it's free.
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="border-border bg-muted/25 flex items-center gap-2 border-t px-5 py-3.5">
+					<Button size="sm">copy the comment</Button>
+					<Button size="sm" variant="outline">I posted it</Button>
+					<span class="text-muted-foreground ml-auto text-xs">we never post for you</span>
+				</div>
+			</Card.Root>
+		</div>
 	</div>
 </section>
 
@@ -119,40 +157,66 @@
 	<div class="mx-auto max-w-6xl px-6 py-20">
 		<h2 class="text-2xl font-semibold tracking-tight">The difference, in two lines</h2>
 
-		<div class="mt-8 grid gap-4 md:grid-cols-2">
-			<Card.Root class="border-dashed">
-				<Card.Header>
-					<Card.Description class="text-xs tracking-wide uppercase">A keyword alert</Card.Description>
-					<Card.Title class="text-muted-foreground text-base leading-snug font-normal">
-						“The word <em class="not-italic">scheduling</em> appeared in r/smallbusiness.”
-					</Card.Title>
-				</Card.Header>
-				<Card.Content>
-					<ul class="text-muted-foreground space-y-1.5 text-sm">
-						<li>Does not know if the writer is buying</li>
-						<li>Does not know if you have anything to say</li>
-						<li>You write the reply, from scratch</li>
-						<li>You pay the same in empty months</li>
-					</ul>
-				</Card.Content>
-			</Card.Root>
+		<div class="mt-8 grid items-start gap-5 md:grid-cols-2">
+			<!-- L'alert: volutamente spento e generico, perché è quello che è. -->
+			<div>
+				<p class="text-muted-foreground mb-3 text-xs tracking-wide uppercase">A keyword alert</p>
 
-			<Card.Root class="border-foreground/25">
-				<Card.Header>
-					<Card.Description class="text-xs tracking-wide uppercase">anomalia/leads</Card.Description>
-					<Card.Title class="text-base leading-snug font-normal">
-						“This person is <em class="not-italic">buying now</em>. Here is what to say.”
-					</Card.Title>
-				</Card.Header>
-				<Card.Content>
-					<ul class="space-y-1.5 text-sm">
-						<li>Ranked by buying intent</li>
-						<li>If you have nothing to add, it stays quiet</li>
-						<li>The draft is ready, in the thread's language</li>
-						<li>You pay for drafts delivered</li>
-					</ul>
-				</Card.Content>
-			</Card.Root>
+				<Card.Root class="border-dashed shadow-none">
+					<Card.Content class="space-y-3 py-5">
+						<div class="flex items-center gap-2">
+							<span class="bg-muted text-muted-foreground grid size-6 place-items-center rounded text-[10px]">
+								@
+							</span>
+							<span class="text-muted-foreground text-xs">inbox · 06:12</span>
+						</div>
+						<p class="text-muted-foreground text-sm">
+							New mention of <span class="text-foreground font-medium">“scheduling”</span> in
+							r/smallbusiness.
+						</p>
+						<p class="text-muted-foreground/70 truncate text-xs">
+							reddit.com/r/smallbusiness/comments/1f2k…
+						</p>
+					</Card.Content>
+				</Card.Root>
+
+				<ul class="text-muted-foreground mt-4 space-y-1.5 text-sm">
+					<li>Does not know if the writer is buying</li>
+					<li>Does not know if you have anything to say</li>
+					<li>You write the reply, from scratch</li>
+					<li>You pay the same in empty months</li>
+				</ul>
+			</div>
+
+			<!-- Il nostro: la stessa conversazione, ma già giudicata e con la risposta pronta. -->
+			<div>
+				<p class="mb-3 text-xs tracking-wide uppercase">anomalia/leads</p>
+
+				<Card.Root class="border-foreground/25 shadow-sm">
+					<Card.Content class="space-y-3 py-5">
+						<div class="flex items-center gap-2">
+							<Badge>buying now</Badge>
+							<span class="text-muted-foreground text-xs">r/smallbusiness · relevance 88</span>
+						</div>
+						<p class="text-sm leading-snug font-medium">
+							Any tool to stop chasing patients for appointment reminders?
+						</p>
+						<div class="border-foreground/25 bg-muted/60 rounded-md border-l-2 p-3">
+							<p class="text-sm leading-relaxed">
+								We ran the same manual chase for two years. What actually moved the needle wasn't
+								the tool — it was sending them 48h out instead of 24h…
+							</p>
+						</div>
+					</Card.Content>
+				</Card.Root>
+
+				<ul class="mt-4 space-y-1.5 text-sm">
+					<li>Ranked by buying intent</li>
+					<li>If you have nothing to add, it stays quiet</li>
+					<li>The draft is ready, in the thread's language</li>
+					<li>You pay for drafts delivered</li>
+				</ul>
+			</div>
 		</div>
 	</div>
 </section>
