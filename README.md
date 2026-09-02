@@ -56,11 +56,25 @@ npm run dev
 
 Il motore gira ed è provato. Attorno non c'è ancora niente:
 
-- [ ] Schema del database (quattro tabelle, elencate nel README del core)
-- [ ] Autenticazione e organizzazioni
-- [ ] Dashboard e coda dei lead
+- [x] Schema del database (quattro tabelle, elencate nel README del core)
+- [x] Autenticazione e organizzazioni
+- [x] Dashboard e coda dei lead
 - [ ] Cron di scansione
-- [ ] Billing
+- [x] Billing
+
+## Billing
+
+I piani stanno in `src/lib/plans.ts` — li legge la landing, li applica il motore. Il catalogo vero
+sta in Stripe, e ogni prodotto porta `metadata.plan_id` (`starter`, `pro`, `agency`): è l'unico
+punto in cui il listino e il codice si toccano.
+
+Non c'è un webhook scritto a mano. L'engine di sync di Supabase mirrora l'account dentro lo schema
+`stripe`, e un trigger su `stripe.subscriptions` riscrive `brands.plan` per tutti i brand del
+proprietario. Il price id da mandare al checkout si legge dal catalogo sincronizzato
+(`price_for_plan(plan, currency)`), mai da una variabile d'ambiente: un id copiato a mano è la
+prima cosa che diverge dal listino.
+
+Serve una variabile sola, `STRIPE_SECRET_KEY`.
 
 ## Licenza
 

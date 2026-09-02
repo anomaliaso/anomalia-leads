@@ -64,6 +64,7 @@ type Verdict = { id: string; relevance: number; intent: string; angle: string };
 
 export type Brand = {
   id: string;
+  owner_id: string;
   name: string;
   about: string;
   site_url: string | null;
@@ -82,6 +83,33 @@ async function loadSources(admin: SupabaseClient, brandId: string): Promise<Sour
 }
 
 export type Failures = { count: number; last: string | null };
+
+/**
+ * Quante bozze restano nel mese all'ACCOUNT, non al brand.
+ *
+ * Il piano si compra una volta e copre tutti i brand del proprietario: contarlo per brand vorrebbe
+ * dire regalare il pacchetto intero a ognuno, che su Agency sono parecchi.
+ *
+ * Si contano le righe che HANNO una bozza, non quelle in stato `suggested`: lo stato cambia quando
+ * l'utente marca il lead come fatto, e contare quello restituirebbe credito a chi lavora.
+ */
+async function draftsLeftThisMonth(admin: SupabaseClient, brand: Brand): Promise<number> {
+  const { data: owned } = await admin.from('brands').select('id').eq('owner_id', brand.owner_id);
+  const ids = (owned ?? []).map((b) => String(b.id));
+
+  const since = new Date();
+  since.setUTCDate(1);
+  since.setUTCHours(0, 0, 0, 0);
+
+  const { count } = await admin
+    .from('brand_news_items')
+    .select('id', { count: 'exact', head: true })
+    .in('brand_id', ids.length ? ids : [brand.id])
+    .not('suggestion', 'is', null)
+    .gte('created_at', since.toISOString());
+
+  return Math.max(0, planFor(brand.plan).draftsPerMonth - (count ?? 0));
+}
 
 /** Le conversazioni mai viste per questo brand, a quote eque fra le sorgenti. */
 async function freshItems(
@@ -129,6 +157,14 @@ export async function scanBrand(
   const failures: Failures = { count: 0, last: null };
   const refs = await loadSources(admin, brand.id);
   if (!refs.length) return { found: 0, judged: 0, drafted: 0 };
+
+  // Il tetto del mese si controlla PRIMA di scaricare e giudicare: un giro che non può produrre
+  // bozze è solo una bolletta di modello e di gateway.
+  const budget = Math.min(planFor(brand.plan).draftsPerDay, await draftsLeftThisMonth(admin, brand));
+  if (budget <= 0) {
+    await logScan(admin, brand.id, refs, 0, 0, started, failures);
+    return { found: 0, judged: 0, drafted: 0 };
+  }
 
   const fresh = await freshItems(admin, brand.id, refs, failures);
   if (!fresh.length) {
@@ -180,7 +216,7 @@ La rilevanza alta è rara. Chi sfoga non è un lead solo perché nomina il tema.
       .eq('id', v.id);
   }
 
-  const drafted = await draftTop(admin, brand, fresh, verdicts, idByHash);
+  const drafted = await draftTop(admin, brand, fresh, verdicts, idByHash, budget);
   await logScan(admin, brand.id, refs, fresh.length, verdicts.length, started, failures);
 
   return { found: fresh.length, judged: verdicts.length, drafted };
@@ -192,9 +228,9 @@ async function draftTop(
   brand: Brand,
   fresh: Array<FeedItem & { hash: string }>,
   verdicts: Verdict[],
-  idByHash: Map<string, string>
+  idByHash: Map<string, string>,
+  budget: number
 ): Promise<number> {
-  const budget = planFor(brand.plan).draftsPerDay;
   const itemById = new Map(fresh.map((i) => [idByHash.get(i.hash) ?? '', i]));
 
   const top = selectTopComments(

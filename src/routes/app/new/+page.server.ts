@@ -4,6 +4,7 @@ import { adminClient } from '$lib/server/supabase';
 import { proposeSources, saveSources } from '$lib/server/seed';
 import { scanBrand, type Brand } from '$lib/server/scan';
 import { createBrandSlug } from '$lib/brand-slug';
+import { planFor } from '$lib/plans';
 
 export const actions: Actions = {
   default: async ({ request, locals }) => {
@@ -24,8 +25,21 @@ export const actions: Actions = {
 
     const admin = adminClient();
 
+    // Più di un brand è la promessa di Agency, e va verificata prima di crearne un secondo. Il
+    // piano si legge dai brand già esistenti: è il trigger del billing a tenerli allineati
+    // all'abbonamento, quindi valgono tutti lo stesso.
+    const { data: mine } = await admin.from('brands').select('plan').eq('owner_id', locals.user.id);
+    const plan = planFor(mine?.[0]?.plan as string | undefined);
+    if ((mine?.length ?? 0) >= 1 && plan.id !== 'agency') {
+      return fail(403, {
+        error: `The ${plan.name} plan covers one brand. Agency covers several — see Billing.`,
+        name,
+        about
+      });
+    }
+
     // Le sorgenti PRIMA del brand: se il modello non ne trova, non resta niente in database.
-    const proposed = await proposeSources(about);
+    const proposed = await proposeSources(about, plan.id);
     if (!proposed.length) {
       return fail(502, {
         error: 'I could not work out any sources. Try again with a more concrete description.',
@@ -43,7 +57,7 @@ export const actions: Actions = {
         about,
         site_url: siteUrl || null
       })
-      .select('id, slug, name, about, site_url, plan')
+      .select('id, owner_id, slug, name, about, site_url, plan')
       .single();
 
     if (error || !brand) return fail(500, { error: error?.message ?? 'could not create the brand', name, about });
