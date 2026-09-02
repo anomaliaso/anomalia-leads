@@ -1,16 +1,11 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { adminClient } from '$lib/server/supabase';
 import { INTENT_RANK, normalizeIntent } from '@anomalia/leads-core/intent';
 import { platformOf, suppressAuthor } from '@anomalia/leads-core/contact';
 
-export const load: PageServerLoad = async ({ locals }) => {
-  const { data: brand } = await locals.supabase
-    .from('brands')
-    .select('id, name, plan')
-    .limit(1)
-    .maybeSingle();
-  if (!brand) redirect(303, '/onboarding');
+export const load: PageServerLoad = async ({ locals, parent }) => {
+  const { brand } = await parent();
 
   const { data: leads } = await locals.supabase
     .from('brand_news_items')
@@ -44,9 +39,10 @@ export const load: PageServerLoad = async ({ locals }) => {
   const broken = Boolean(scan && scan.sources_failed > 0 && scan.items_found === 0);
 
   return {
-    brand,
     leads: queue,
-    scan: scan ? { broken, failed: scan.sources_failed, total, error: scan.last_error } : null
+    scan: scan
+      ? { broken, failed: scan.sources_failed, total, error: scan.last_error, at: scan.created_at }
+      : null
   };
 };
 
