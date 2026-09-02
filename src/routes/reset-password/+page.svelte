@@ -4,9 +4,12 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as Card from '$lib/components/ui/card';
 	import BrandMark from '$lib/components/BrandMark.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 
 	let { form } = $props();
 </script>
+
+<Seo title="Set a new password — anomalia/leads" description="Choose a new password for your account." noindex />
 
 <div class="mx-auto flex min-h-svh max-w-md flex-col justify-center px-6 py-12">
 	<a href="/" class="mb-8 flex items-center gap-2 self-start" aria-label="anomalia/leads">

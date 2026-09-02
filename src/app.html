@@ -4,6 +4,15 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+
+		<!-- Icone e manifesto stanno qui e non in un layout: valgono per ogni pagina, pagina di
+		     errore compresa, e non c'è niente da calcolare a runtime. -->
+		<link rel="icon" href="/favicon.ico" sizes="32x32" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#09090b" />
 		<script>
 			// Deve girare PRIMA della prima pittura, o il tema lampeggia: il server non sa cosa
 			// preferisce questo browser, quindi la decisione si prende qui e subito.

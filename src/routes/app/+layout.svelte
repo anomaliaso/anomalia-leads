@@ -14,6 +14,7 @@
 			? [
 					{ href: `/app/${slug}`, label: 'Queue', exact: true },
 					{ href: `/app/${slug}/sources`, label: 'Sources', exact: false },
+					{ href: `/app/${slug}/api`, label: 'API', exact: false },
 					{ href: `/app/${slug}/billing`, label: 'Billing', exact: false }
 				]
 			: []
@@ -27,6 +28,12 @@
 		goto(value === '__new' ? '/app/new' : `/app/${value}`);
 	}
 </script>
+
+<svelte:head>
+	<!-- Dietro il login non c'è contenuto da indicizzare: al crawler tocca solo un redirect. -->
+	<title>anomalia/leads</title>
+	<meta name="robots" content="noindex, nofollow" />
+</svelte:head>
 
 <div class="border-border bg-background/80 sticky top-0 z-10 border-b backdrop-blur">
 	<div class="mx-auto flex max-w-4xl items-center gap-3 px-6 py-3">

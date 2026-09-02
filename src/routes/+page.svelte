@@ -5,6 +5,9 @@
 	import BrandMark from '$lib/components/BrandMark.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { PLANS } from '$lib/plans';
+	import Seo from '$lib/components/Seo.svelte';
+	import { SITE, ldJson, siteOrigin } from '$lib/seo';
+	import { page } from '$app/state';
 	import { currencyFromBrowser, type Currency } from '$lib/currency';
 
 	let { data } = $props();
@@ -68,14 +71,85 @@
 			a: 'Because mentions are not the value. The whole category sells keyword caps and charges you the same in a month where it found nothing. We count what we hand you.'
 		}
 	];
+
+	/**
+	 * I dati strutturati si costruiscono da PLANS e da FAQ, le stesse costanti che disegnano la
+	 * pagina. Riscriverli a mano significherebbe avere due listini: quello che l'utente legge e
+	 * quello che Google e i modelli citano, che divergono al primo cambio di prezzo.
+	 */
+	const origin = $derived(siteOrigin(page.url.origin));
+	const structuredData = $derived({
+		'@context': 'https://schema.org',
+		'@graph': [
+			{
+				'@type': 'Organization',
+				'@id': `${origin}/#organization`,
+				name: SITE.publisher,
+				url: origin,
+				logo: { '@type': 'ImageObject', url: `${origin}/icon-512.png`, width: 512, height: 512 },
+				sameAs: [SITE.github, 'https://github.com/anomaliaso/anomalia']
+			},
+			{
+				'@type': 'WebSite',
+				'@id': `${origin}/#website`,
+				url: origin,
+				name: SITE.name,
+				description: SITE.description,
+				inLanguage: 'en',
+				publisher: { '@id': `${origin}/#organization` }
+			},
+			{
+				'@type': 'SoftwareApplication',
+				'@id': `${origin}/#software`,
+				name: SITE.name,
+				url: origin,
+				applicationCategory: 'BusinessApplication',
+				applicationSubCategory: 'Social listening and lead generation',
+				operatingSystem: 'Web browser',
+				description: SITE.description,
+				image: `${origin}${SITE.image}`,
+				publisher: { '@id': `${origin}/#organization` },
+				featureList: [
+					'Monitors Reddit, Threads, X and LinkedIn',
+					'Ranks conversations by buying intent, not keyword relevance',
+					'Writes the reply for that specific thread, in its language',
+					'Never posts on your behalf',
+					'One contact per person, capped across the whole platform',
+					'Measures the outcome of a comment after 48 hours'
+				],
+				offers: PLANS.flatMap((plan) =>
+					[
+						['EUR', plan.eur],
+						['USD', plan.usd]
+					].map(([priceCurrency, price]) => ({
+						'@type': 'Offer',
+						name: plan.name,
+						price: String(price),
+						priceCurrency,
+						url: `${origin}/#pricing`,
+						availability: 'https://schema.org/InStock',
+						description: plan.lines.join(', ')
+					}))
+				)
+			},
+			{
+				'@type': 'FAQPage',
+				'@id': `${origin}/#faq`,
+				inLanguage: 'en',
+				mainEntity: FAQ.map((f) => ({
+					'@type': 'Question',
+					name: f.q,
+					acceptedAnswer: { '@type': 'Answer', text: f.a }
+				}))
+			}
+		]
+	});
 </script>
 
+<Seo title="anomalia/leads — {SITE.tagline}" />
+
 <svelte:head>
-	<title>anomalia/leads — the conversations where you have something to say</title>
-	<meta
-		name="description"
-		content="Find the people on Reddit, Threads, X and LinkedIn who are looking for what you sell, ranked by buying intent, with the reply already written."
-	/>
+	{@html ldJson(structuredData)}
 </svelte:head>
 
 <header class="border-border/60 border-b">

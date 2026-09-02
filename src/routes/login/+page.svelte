@@ -4,12 +4,15 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as Card from '$lib/components/ui/card';
 	import BrandMark from '$lib/components/BrandMark.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 
 	let { data, form } = $props();
 
 	// L'errore può arrivare dal form (credenziali) o dall'URL (ritorno da GitHub andato male).
 	const error = $derived(form?.error ?? data.error);
 </script>
+
+<Seo title="Sign in — anomalia/leads" description="Sign in to anomalia/leads." noindex />
 
 <div class="mx-auto flex min-h-svh max-w-md flex-col justify-center px-6 py-12">
 	<a href="/" class="mb-8 flex items-center gap-2 self-start" aria-label="anomalia/leads">

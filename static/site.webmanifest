@@ -1,0 +1,16 @@
+{
+	"name": "anomalia/leads",
+	"short_name": "anomalia/leads",
+	"description": "The conversations where you have something to say, ranked by buying intent, with the reply already written.",
+	"start_url": "/app",
+	"scope": "/",
+	"display": "standalone",
+	"background_color": "#09090b",
+	"theme_color": "#e45438",
+	"icons": [
+		{ "src": "/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+		{ "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+		{ "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" },
+		{ "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any" }
+	]
+}
