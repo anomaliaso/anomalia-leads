@@ -7,9 +7,9 @@
  * Solo per i titoli GRANDI: uno script decorativo a 16px non si legge, quindi i titoli delle card
  * restano sul font di sistema.
  */
-/* Machy arriva già in formato web: woff2 a 30 KB contro i 69 dell'OTF, e il woff dietro per i
-   browser che non lo prendono. Il CSS fornito dal produttore punta a file `LUSTRELLA.*` che nel
-   pacchetto non esistono — copiato da un altro font — quindi è riscritto qui. */
+/* Machy arriva già in formato web: woff2 a 30 KB contro i 69 dell'OTF. Il CSS del produttore
+   punta a file `LUSTRELLA.*` che nel pacchetto non esistono — copiato da un altro font — quindi
+   è riscritto qui sui nomi veri. */
 @font-face {
 	font-family: 'Machy';
 	src:
@@ -96,7 +96,7 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
-	--font-display: 'Machy', 'Magic Hours', ui-serif, Georgia, serif;
+	--font-display: 'Machy', ui-serif, Georgia, serif;
 }
 
 @layer base {
@@ -112,12 +112,13 @@
 	.font-display {
 		font-family: var(--font-display);
 		font-weight: 400;
-		/* Il font ha UN SOLO peso. Con `font-semibold` addosso il browser lo ingrossa da sé, e su
-		   uno script i glifi si impastano: meglio niente grassetto che un grassetto finto. */
+		/* Il font ha UN SOLO peso. Con `font-semibold` addosso il browser lo ingrossa da sé e i
+		   glifi si impastano: meglio niente grassetto che un grassetto finto. */
 		font-synthesis-weight: none;
-		/* Uno script decorativo vuole aria: le lettere hanno già i loro svolazzi, e `tracking-tight`
-		   le faceva scontrare. L'interlinea segue, altrimenti le ascendenti si toccano. */
-		letter-spacing: 0.02em;
-		line-height: 1.15;
+		/* Tutto maiuscolo: è come questa famiglia è disegnata. Le capitali vogliono PIÙ spazio fra
+		   le lettere, non meno — e senza discendenti l'interlinea può stringersi. */
+		text-transform: uppercase;
+		letter-spacing: 0.045em;
+		line-height: 1.08;
 	}
 }
