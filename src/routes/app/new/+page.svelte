@@ -11,7 +11,7 @@
 </script>
 
 <div class="mx-auto max-w-2xl px-6 py-14">
-	<h1 class="text-2xl font-semibold tracking-tight">
+	<h1 class="font-display text-2xl">
 		{first ? 'What do you sell?' : 'Another brand'}
 	</h1>
 	<p class="text-muted-foreground mt-2 text-sm text-pretty">

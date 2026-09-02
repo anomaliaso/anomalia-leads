@@ -77,7 +77,7 @@
 		<div>
 			<Badge variant="outline" class="mb-6 font-normal">Reddit · Threads · X · LinkedIn</Badge>
 
-			<h1 class="text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
+			<h1 class="font-display text-5xl text-balance sm:text-6xl">
 				Someone is already looking for what you sell
 			</h1>
 
@@ -157,7 +157,7 @@
 <!-- Il contrasto: è il modo più rapido di spiegare la differenza con un alert -->
 <section class="border-border bg-muted/30 border-y">
 	<div class="mx-auto max-w-6xl px-6 py-20">
-		<h2 class="text-2xl font-semibold tracking-tight">The difference, in two lines</h2>
+		<h2 class="font-display text-2xl">The difference, in two lines</h2>
 
 		<div class="mt-8 grid items-start gap-5 md:grid-cols-2">
 			<!-- L'alert: volutamente spento e generico, perché è quello che è. -->
@@ -225,7 +225,7 @@
 
 <!-- Come funziona -->
 <section class="mx-auto max-w-6xl px-6 py-20">
-	<h2 class="text-2xl font-semibold tracking-tight">How it works</h2>
+	<h2 class="font-display text-2xl">How it works</h2>
 	<ol class="mt-10 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
 		{#each STEPS as s (s.n)}
 			<li class="border-border border-t pt-4">
@@ -240,7 +240,7 @@
 <!-- I principi -->
 <section class="border-border border-t">
 	<div class="mx-auto max-w-6xl px-6 py-20">
-		<h2 class="text-2xl font-semibold tracking-tight">Four choices that set us apart</h2>
+		<h2 class="font-display text-2xl">Four choices that set us apart</h2>
 		<p class="text-muted-foreground mt-2 max-w-2xl text-pretty">
 			Three of the four are brakes. That is deliberate: in this category what you refuse to do
 			matters more than what you do.
@@ -290,7 +290,7 @@
 <!-- Prezzi -->
 <section id="pricing" class="border-border bg-muted/30 scroll-mt-4 border-t">
 	<div class="mx-auto max-w-6xl px-6 py-20">
-		<h2 class="text-2xl font-semibold tracking-tight">Pricing</h2>
+		<h2 class="font-display text-2xl">Pricing</h2>
 		<p class="text-muted-foreground mt-2 max-w-2xl text-pretty">
 			You pay for the drafts you receive, not for the keywords you monitor. A quiet month costs you
 			less, instead of the same.
@@ -340,7 +340,7 @@
 <!-- Domande -->
 <section class="border-border border-t">
 	<div class="mx-auto max-w-3xl px-6 py-20">
-		<h2 class="text-2xl font-semibold tracking-tight">Questions</h2>
+		<h2 class="font-display text-2xl">Questions</h2>
 		<div class="divide-border mt-8 divide-y">
 			{#each FAQ as f (f.q)}
 				<details class="group py-4">
@@ -357,7 +357,7 @@
 <!-- Chiusura -->
 <section class="border-border border-t">
 	<div class="mx-auto max-w-6xl px-6 py-24 text-center">
-		<h2 class="text-3xl font-semibold tracking-tight text-balance">
+		<h2 class="font-display text-3xl text-balance">
 			The conversation you need is already open
 		</h2>
 		<p class="text-muted-foreground mx-auto mt-4 max-w-md text-pretty">
@@ -382,9 +382,13 @@
 			<a href="https://github.com/anomaliaso/anomalia" class="hover:text-foreground underline underline-offset-4">
 				Anomalia
 			</a>
-			· Apache-2.0 ·
+			· Apache-2.0
+		</span>
+		<span class="flex flex-wrap items-center gap-4">
+			<a href="/privacy" class="hover:text-foreground underline underline-offset-4">Privacy</a>
+			<a href="/terms" class="hover:text-foreground underline underline-offset-4">Terms</a>
 			<a href="https://github.com/anomaliaso/anomalia-leads" class="hover:text-foreground underline underline-offset-4">
-				open source
+				Source
 			</a>
 		</span>
 	</div>

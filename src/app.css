@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/**
+ * Il font dei titoli. `swap` di proposito: il testo si legge subito col font di sistema e cambia
+ * quando arriva — con `block` la pagina resterebbe muta per centinaia di millisecondi.
+ *
+ * Solo per i titoli GRANDI: uno script decorativo a 16px non si legge, quindi i titoli delle card
+ * restano sul font di sistema.
+ */
+@font-face {
+	font-family: 'Magic Hours';
+	src: url('/fonts/magic-hours.otf') format('opentype');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -68,6 +83,7 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
+	--font-display: 'Magic Hours', ui-serif, Georgia, serif;
 }
 
 @layer base {
@@ -76,5 +92,19 @@
 	}
 	body {
 		@apply bg-background text-foreground;
+	}
+
+	/* Solo i titoli di display. Le `Card.Title` restano sul font di sistema: a quelle dimensioni
+	   uno script decorativo costa leggibilità e non aggiunge niente. */
+	.font-display {
+		font-family: var(--font-display);
+		font-weight: 400;
+		/* Il font ha UN SOLO peso. Con `font-semibold` addosso il browser lo ingrossa da sé, e su
+		   uno script i glifi si impastano: meglio niente grassetto che un grassetto finto. */
+		font-synthesis-weight: none;
+		/* Uno script decorativo vuole aria: le lettere hanno già i loro svolazzi, e `tracking-tight`
+		   le faceva scontrare. L'interlinea segue, altrimenti le ascendenti si toccano. */
+		letter-spacing: 0.02em;
+		line-height: 1.15;
 	}
 }

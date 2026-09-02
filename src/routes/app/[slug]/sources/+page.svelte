@@ -20,7 +20,7 @@
 </script>
 
 <div class="mx-auto max-w-4xl px-6 py-10">
-	<h1 class="text-xl font-semibold tracking-tight">Sources</h1>
+	<h1 class="font-display text-xl">Sources</h1>
 	<p class="text-muted-foreground mt-1 text-sm text-pretty">
 		The places we watch for you. {active} active of {data.sources.length}. A specific source produces
 		leads; a huge generic one produces noise.

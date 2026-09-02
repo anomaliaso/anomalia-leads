@@ -57,7 +57,7 @@
 <div class="mx-auto max-w-4xl px-6 py-10">
 	<header class="flex items-start justify-between gap-4">
 		<div>
-			<h1 class="text-xl font-semibold tracking-tight">
+			<h1 class="font-display text-xl">
 				{data.leads.length}
 				{data.leads.length === 1 ? 'conversation' : 'conversations'}
 			</h1>
