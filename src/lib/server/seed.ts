@@ -139,6 +139,75 @@ sbagliata cola dentro le bozze.`
   };
 }
 
+const MORE_SCHEMA = {
+  type: 'object',
+  properties: {
+    subreddits: {
+      type: 'array',
+      items: { type: 'string' },
+      description: '0-5 REAL, active subreddit names (without r/) where this product\'s buyers actually talk. Prefer specific communities over giant generic ones. Return fewer, or none, rather than padding the list with places that do not fit.'
+    },
+    reddit_queries: {
+      type: 'array',
+      items: { type: 'string' },
+      description: '0-4 Reddit keyword searches (plain keywords, no boolean operators) that surface people ASKING for a solution like this one — not people discussing the topic in general.'
+    }
+  },
+  required: ['subreddits', 'reddit_queries']
+} as const;
+
+/**
+ * Altre sorgenti per un brand che ne ha già.
+ *
+ * Non è `analyzeSite` con un altro nome: lì il sito è l'unica cosa che si sa, qui si sa già cosa
+ * vende il brand E dove lo stiamo già guardando. Le sorgenti esistenti entrano nel prompt per
+ * essere ESCLUSE — senza, il modello ripropone le stesse tre ovvie ogni volta che si preme il
+ * pulsante, e la seconda pressione non aggiunge niente.
+ *
+ * `null` vuol dire che il modello non ha risposto; `[]` che non aveva altro da proporre. Sono
+ * due frasi diverse in pagina, e confonderle è il modo di dare la colpa all'utente per un guasto
+ * nostro.
+ *
+ * Il filtro però non si fida del prompt: quello che torna passa comunque dalla lista di esclusione
+ * qui sotto. Un'istruzione non è un vincolo.
+ *
+ * ponytail: propone solo subreddit e ricerche Reddit, le due che ogni piano copre. Threads, X e
+ * LinkedIn vorrebbero un vocabolario per tipo (un `x_community` è un id, non parole chiave) e
+ * quindi uno schema per tipo: si aggiunge quando qualcuno lo chiede, non prima.
+ */
+export async function suggestSources(
+  about: string,
+  existing: { kind: string; value: string }[] = []
+): Promise<ProposedSource[] | null> {
+
+  const taken = new Set(existing.map((s) => `${s.kind}:${s.value.toLowerCase()}`));
+  const already = existing.length
+    ? existing.map((s) => `- ${s.kind}: ${s.value}`).join('\n')
+    : '(nessuna)';
+
+  const more = await aiObject<{ subreddits: string[]; reddit_queries: string[] }>({
+    schema: MORE_SCHEMA as unknown as Record<string, unknown>,
+    system: 'You set up social listening for a product. You know which online communities actually exist and which ones are dead.',
+    prompt: `IL PRODOTTO: ${about}
+
+DOVE LO STIAMO GIÀ GUARDANDO:
+${already}
+
+Proponi ALTRI posti, diversi da quelli qui sopra e diversi fra loro. Cerca le persone che
+POTREBBERO COMPRARLO, non chi discute il tema in astratto: un subreddit enorme e generico produce
+rumore, uno specifico produce lead.
+
+Se non ce ne sono altri che valgano davvero, torna liste vuote: una sorgente inutile costa più di
+una mancata.`
+  });
+  if (!more) return null;
+
+  return [
+    ...(more.subreddits ?? []).map((s) => ({ kind: 'subreddit' as const, value: String(s).replace(/^r\//, '').trim() })),
+    ...(more.reddit_queries ?? []).map((q) => ({ kind: 'reddit_query' as const, value: String(q).trim() }))
+  ].filter((s) => s.value && !taken.has(`${s.kind}:${s.value.toLowerCase()}`));
+}
+
 export async function saveSources(
   admin: SupabaseClient,
   brandId: string,

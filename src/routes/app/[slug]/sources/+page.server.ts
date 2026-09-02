@@ -2,6 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import { adminClient } from '$lib/server/supabase';
 import { planFor } from '$lib/plans';
+import { suggestSources } from '$lib/server/seed';
 
 const KINDS = ['subreddit', 'reddit_query', 'threads_query', 'linkedin_query', 'x_community'] as const;
 type Kind = (typeof KINDS)[number];
@@ -26,6 +27,48 @@ async function owned(locals: App.Locals, id: string) {
 }
 
 export const actions: Actions = {
+  /**
+   * Chiedi al modello altre sorgenti.
+   *
+   * Non scrive niente: torna delle proposte, e l'utente le aggiunge una per una dall'azione `add`,
+   * che è dove vivono i controlli di piano. Scriverle da qui vorrebbe dire avere due porte per la
+   * stessa tabella, e una sola delle due che fa rispettare il listino.
+   */
+  suggest: async ({ locals, params }) => {
+    const { data: brand } = await locals.supabase
+      .from('brands')
+      .select('id, about, plan')
+      .eq('slug', params.slug)
+      .maybeSingle();
+    if (!brand) return fail(404, { error: 'brand not found' });
+
+    const about = String(brand.about ?? '').trim();
+    if (!about) {
+      return fail(400, { error: 'We need to know what you sell first: add a description to the brand.' });
+    }
+
+    const { data: existing } = await locals.supabase
+      .from('brand_sources')
+      .select('kind, value')
+      .eq('brand_id', brand.id);
+
+    // Proporne più di quante ce ne stanno significherebbe far scegliere all'utente delle sorgenti
+    // che l'azione `add` poi rifiuta una per una.
+    const plan = planFor(brand.plan as string);
+    const room = plan.sources === null ? Infinity : plan.sources - (existing?.length ?? 0);
+    if (room <= 0) {
+      return fail(403, { error: `The ${plan.name} plan covers ${plan.sources} sources. Remove one to make room.` });
+    }
+
+    const proposed = await suggestSources(about, existing ?? []);
+    if (!proposed) return fail(502, { error: 'The model did not answer. Try again in a moment.' });
+    if (!proposed.length) {
+      return { suggestions: [], note: 'Nothing worth adding beyond what you already watch.' };
+    }
+
+    return { suggestions: proposed.slice(0, room), note: null };
+  },
+
   add: async ({ request, locals, params }) => {
     // Le azioni non hanno `parent()`: il brand si rilegge DALLO SLUG, non "il primo". Con più
     // brand, un `.limit(1)` avrebbe scritto la sorgente in quello sbagliato.
