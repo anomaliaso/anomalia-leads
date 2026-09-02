@@ -27,6 +27,12 @@
 	}
 </script>
 
+<svelte:head>
+	<!-- Dietro il login non c'è contenuto da indicizzare: al crawler tocca solo un redirect. -->
+	<title>anomalia/leads</title>
+	<meta name="robots" content="noindex, nofollow" />
+</svelte:head>
+
 <div class="border-border bg-background/80 sticky top-0 z-10 border-b backdrop-blur">
 	<div class="mx-auto flex max-w-4xl items-center gap-3 px-6 py-3">
 		{#if data.brands.length}

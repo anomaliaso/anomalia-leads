@@ -1,12 +1,13 @@
 <script lang="ts">
 	import BrandMark from '$lib/components/BrandMark.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import Seo from '$lib/components/Seo.svelte';
 </script>
 
-<svelte:head>
-	<title>Privacy Policy — anomalia/leads</title>
-	<meta name="robots" content="index" />
-</svelte:head>
+<Seo
+	title="Privacy Policy — anomalia/leads"
+	description="What anomalia/leads collects, why, where it lives, and how to have it deleted."
+/>
 
 <header class="border-border/60 border-b">
 	<div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">

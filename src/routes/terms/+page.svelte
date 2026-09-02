@@ -2,12 +2,13 @@
 	import BrandMark from '$lib/components/BrandMark.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { PLANS } from '$lib/plans';
+	import Seo from '$lib/components/Seo.svelte';
 </script>
 
-<svelte:head>
-	<title>Terms of Service — anomalia/leads</title>
-	<meta name="robots" content="index" />
-</svelte:head>
+<Seo
+	title="Terms of Service — anomalia/leads"
+	description="The terms of using anomalia/leads: plans, limits, what we never do on your behalf, and how to leave."
+/>
 
 <header class="border-border/60 border-b">
 	<div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
