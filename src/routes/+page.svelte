@@ -5,6 +5,39 @@
 	import BrandMark from '$lib/components/BrandMark.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { PLANS } from '$lib/plans';
+	import { currencyFromBrowser, type Currency } from '$lib/currency';
+
+	let { data } = $props();
+
+	/**
+	 * La valuta ha tre fonti, in ordine: la scelta dell'utente, il paese dedotto dal server, il
+	 * dollaro. L'override è l'unico stato — tenere anche il valore mostrato significherebbe averne
+	 * due che possono discordare quando il server cambia idea.
+	 */
+	let override = $state<Currency | null>(null);
+	const currency = $derived(override ?? data.currency ?? 'usd');
+	const symbol = $derived(currency === 'eur' ? '€' : '$');
+
+	$effect(() => {
+		let saved: string | null = null;
+		try {
+			saved = localStorage.getItem('currency');
+		} catch {
+			// Storage negato: si resta sul rilevamento.
+		}
+		if (saved === 'eur' || saved === 'usd') override = saved;
+		else if (!data.currency) override = currencyFromBrowser();
+	});
+
+	function pick(next: Currency) {
+		override = next;
+		try {
+			localStorage.setItem('currency', next);
+		} catch {
+			// Vale per questa pagina e basta.
+		}
+	}
+
 
 	const STEPS = [
 		{ n: '01', t: 'Tell us what you sell', d: 'A description, not a questionnaire. From it we work out where your buyers actually talk.' },
@@ -290,11 +323,30 @@
 <!-- Prezzi -->
 <section id="pricing" class="border-border bg-muted/30 scroll-mt-4 border-t">
 	<div class="mx-auto max-w-6xl px-6 py-20">
-		<h2 class="font-semibold tracking-tight text-2xl">Pricing</h2>
-		<p class="text-muted-foreground mt-2 max-w-2xl text-pretty">
-			You pay for the drafts you receive, not for the keywords you monitor. A quiet month costs you
-			less, instead of the same.
-		</p>
+		<div class="flex flex-wrap items-start justify-between gap-4">
+			<div>
+				<h2 class="font-semibold tracking-tight text-2xl">Pricing</h2>
+				<p class="text-muted-foreground mt-2 max-w-2xl text-pretty">
+					You pay for the drafts you receive, not for the keywords you monitor. A quiet month costs
+					you less, instead of the same.
+				</p>
+			</div>
+
+			<div class="border-input bg-background flex shrink-0 rounded-md border p-0.5" role="group" aria-label="Currency">
+				{#each [{ id: 'eur' as Currency, label: '€ EUR' }, { id: 'usd' as Currency, label: '$ USD' }] as c (c.id)}
+					<button
+						type="button"
+						onclick={() => pick(c.id)}
+						aria-pressed={currency === c.id}
+						class="rounded px-3 py-1 text-sm transition-colors {currency === c.id
+							? 'bg-muted text-foreground'
+							: 'text-muted-foreground hover:text-foreground'}"
+					>
+						{c.label}
+					</button>
+				{/each}
+			</div>
+		</div>
 
 		<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 			{#each PLANS as p (p.id)}
@@ -306,10 +358,12 @@
 								<Badge variant="secondary" class="font-normal">recommended</Badge>
 							{/if}
 						</div>
-						<p class="mt-2 flex items-baseline gap-2">
-							<span class="text-3xl font-semibold tracking-tight">€{p.eur}</span>
+						<p class="mt-2 flex items-baseline gap-1.5">
+							<span class="text-3xl font-semibold tracking-tight">
+								{symbol}{currency === 'eur' ? p.eur : p.usd}
+							</span>
 							{#if p.eur > 0}
-								<span class="text-muted-foreground text-sm">/ ${p.usd} per month</span>
+								<span class="text-muted-foreground text-sm">per month</span>
 							{/if}
 						</p>
 					</Card.Header>
