@@ -65,6 +65,7 @@ type Verdict = { id: string; relevance: number; intent: string; angle: string };
 
 export type Brand = {
   id: string;
+  owner_id: string;
   name: string;
   about: string;
   site_url: string | null;
@@ -85,6 +86,33 @@ async function loadSources(admin: SupabaseClient, brandId: string): Promise<Sour
 }
 
 export type Failures = { count: number; last: string | null };
+
+/**
+ * Quante bozze restano nel mese all'ACCOUNT, non al brand.
+ *
+ * Il piano si compra una volta e copre tutti i brand del proprietario: contarlo per brand vorrebbe
+ * dire regalare il pacchetto intero a ognuno, che su Agency sono parecchi.
+ *
+ * Si contano le righe che HANNO una bozza, non quelle in stato `suggested`: lo stato cambia quando
+ * l'utente marca il lead come fatto, e contare quello restituirebbe credito a chi lavora.
+ */
+async function draftsLeftThisMonth(admin: SupabaseClient, brand: Brand): Promise<number> {
+  const { data: owned } = await admin.from('brands').select('id').eq('owner_id', brand.owner_id);
+  const ids = (owned ?? []).map((b) => String(b.id));
+
+  const since = new Date();
+  since.setUTCDate(1);
+  since.setUTCHours(0, 0, 0, 0);
+
+  const { count } = await admin
+    .from('brand_news_items')
+    .select('id', { count: 'exact', head: true })
+    .in('brand_id', ids.length ? ids : [brand.id])
+    .not('suggestion', 'is', null)
+    .gte('created_at', since.toISOString());
+
+  return Math.max(0, planFor(brand.plan).draftsPerMonth - (count ?? 0));
+}
 
 /** Le conversazioni mai viste per questo brand, a quote eque fra le sorgenti. */
 async function freshItems(
@@ -113,14 +141,20 @@ async function freshItems(
   const picked = roundRobin(byOrigin, MAX_ITEMS_PER_SCAN);
   if (!picked.length) return [];
 
+  // La stessa conversazione arriva volentieri da due sorgenti: un crosspost, o una ricerca che
+  // ripesca un thread del subreddit già in lista. In database è un conflitto sull'unique, e in una
+  // insert sola fa fallire TUTTE le righe, non la sua — il giro tornava "40 trovate" e zero in
+  // coda. Si toglie qui, dove il duplicato si vede ancora.
+  const unique = [...new Map(picked.map((p) => [p.hash, p])).values()];
+
   const { data: seen } = await admin
     .from('brand_news_items')
     .select('url_hash')
     .eq('brand_id', brandId)
-    .in('url_hash', picked.map((p) => p.hash));
+    .in('url_hash', unique.map((p) => p.hash));
   const known = new Set((seen ?? []).map((r) => String(r.url_hash)));
 
-  return picked.filter((p) => !known.has(p.hash));
+  return unique.filter((p) => !known.has(p.hash));
 }
 
 /** Un giro completo. Non lancia: torna il conto di cosa è successo. */
@@ -133,13 +167,21 @@ export async function scanBrand(
   const refs = await loadSources(admin, brand.id);
   if (!refs.length) return { found: 0, judged: 0, drafted: 0 };
 
+  // Il tetto del mese si controlla PRIMA di scaricare e giudicare: un giro che non può produrre
+  // bozze è solo una bolletta di modello e di gateway.
+  const budget = Math.min(planFor(brand.plan).draftsPerDay, await draftsLeftThisMonth(admin, brand));
+  if (budget <= 0) {
+    await logScan(admin, brand.id, refs, 0, 0, started, failures);
+    return { found: 0, judged: 0, drafted: 0 };
+  }
+
   const fresh = await freshItems(admin, brand.id, refs, failures);
   if (!fresh.length) {
     await logScan(admin, brand.id, refs, 0, 0, started, failures);
     return { found: 0, judged: 0, drafted: 0 };
   }
 
-  const { data: inserted } = await admin
+  const { data: inserted, error: insertFailed } = await admin
     .from('brand_news_items')
     .insert(
       fresh.map((i) => ({
@@ -153,6 +195,17 @@ export async function scanBrand(
       }))
     )
     .select('id, url_hash');
+
+  // Questo errore veniva ignorato, ed era il guasto più caro del giro: senza righe non c'è niente
+  // da giudicare, il modello veniva pagato per verdetti su id inesistenti, e la coda diceva
+  // "nessuna conversazione" a chi ne aveva quaranta. Si ferma qui e lo si dichiara.
+  if (insertFailed) {
+    console.warn('[scan] insert conversazioni:', insertFailed.message.slice(0, 300));
+    failures.count++;
+    failures.last = `insert: ${insertFailed.message.slice(0, 300)}`;
+    await logScan(admin, brand.id, refs, fresh.length, 0, started, failures);
+    return { found: fresh.length, judged: 0, drafted: 0 };
+  }
 
   const idByHash = new Map((inserted ?? []).map((r) => [String(r.url_hash), String(r.id)]));
 
@@ -183,7 +236,7 @@ La rilevanza alta è rara. Chi sfoga non è un lead solo perché nomina il tema.
       .eq('id', v.id);
   }
 
-  const drafted = await draftTop(admin, brand, fresh, verdicts, idByHash);
+  const drafted = await draftTop(admin, brand, fresh, verdicts, idByHash, budget);
   await logScan(admin, brand.id, refs, fresh.length, verdicts.length, started, failures);
 
   // Un ping, non il contenuto: chi lo riceve chiama `get_queue` per i dettagli, così il payload
@@ -206,9 +259,9 @@ async function draftTop(
   brand: Brand,
   fresh: Array<FeedItem & { hash: string }>,
   verdicts: Verdict[],
-  idByHash: Map<string, string>
+  idByHash: Map<string, string>,
+  budget: number
 ): Promise<number> {
-  const budget = planFor(brand.plan).draftsPerDay;
   const itemById = new Map(fresh.map((i) => [idByHash.get(i.hash) ?? '', i]));
 
   const top = selectTopComments(

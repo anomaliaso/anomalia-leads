@@ -6,7 +6,7 @@ import { scanBrand, type Brand } from '$lib/server/scan';
 
 export const config = { maxDuration: 300 };
 
-const BRAND_COLUMNS = 'id, name, about, site_url, plan, webhook_url, webhook_secret';
+const BRAND_COLUMNS = 'id, owner_id, name, about, site_url, plan, webhook_url, webhook_secret';
 
 /**
  * Il cron passa il segreto e scansiona tutti; un utente loggato scansiona il proprio brand e

@@ -14,7 +14,8 @@
 			? [
 					{ href: `/app/${slug}`, label: 'Queue', exact: true },
 					{ href: `/app/${slug}/sources`, label: 'Sources', exact: false },
-					{ href: `/app/${slug}/api`, label: 'API', exact: false }
+					{ href: `/app/${slug}/api`, label: 'API', exact: false },
+					{ href: `/app/${slug}/billing`, label: 'Billing', exact: false }
 				]
 			: []
 	);

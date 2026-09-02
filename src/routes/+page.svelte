@@ -440,6 +440,9 @@
 								<span class="text-muted-foreground text-sm">per month</span>
 							{/if}
 						</p>
+						{#if p.eur > 0}
+							<p class="text-muted-foreground text-xs">tax included</p>
+						{/if}
 					</Card.Header>
 					<Card.Content class="flex-1">
 						<ul class="text-muted-foreground space-y-2 text-sm">

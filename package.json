@@ -19,6 +19,7 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:keys": "supabase status -o env",
+    "db:test": "docker exec -i supabase_db_anomalia-leads psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/billing.sql",
     "core:pull": "git subtree pull --prefix=packages/leads-core https://github.com/anomaliaso/anomalia.git leads-core-dist --squash"
   },
   "dependencies": {

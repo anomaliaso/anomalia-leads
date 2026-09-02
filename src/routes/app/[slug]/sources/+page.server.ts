@@ -1,6 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { fail } from '@sveltejs/kit';
 import { adminClient } from '$lib/server/supabase';
+import { planFor } from '$lib/plans';
 
 const KINDS = ['subreddit', 'reddit_query', 'threads_query', 'linkedin_query', 'x_community'] as const;
 type Kind = (typeof KINDS)[number];
@@ -30,7 +31,7 @@ export const actions: Actions = {
     // brand, un `.limit(1)` avrebbe scritto la sorgente in quello sbagliato.
     const { data: brand } = await locals.supabase
       .from('brands')
-      .select('id')
+      .select('id, plan')
       .eq('slug', params.slug)
       .maybeSingle();
     if (!brand) return fail(404, { error: 'brand not found' });
@@ -41,6 +42,22 @@ export const actions: Actions = {
 
     if (!KINDS.includes(kind)) return fail(400, { error: 'Unknown source kind.' });
     if (!value) return fail(400, { error: 'A value is required: a subreddit or some keywords.' });
+
+    // I due limiti che il listino promette — quante sorgenti e quali piattaforme — si applicano
+    // qui, sull'unica porta da cui una sorgente entra. Prometterli sulla landing e non applicarli
+    // è il modo più rapido di vendere una cosa che non esiste.
+    const plan = planFor(brand.plan as string);
+    if (!plan.platforms.includes(kind)) {
+      return fail(403, { error: `The ${plan.name} plan does not cover this kind of source.` });
+    }
+
+    const { count } = await locals.supabase
+      .from('brand_sources')
+      .select('id', { count: 'exact', head: true })
+      .eq('brand_id', brand.id);
+    if (plan.sources !== null && (count ?? 0) >= plan.sources) {
+      return fail(403, { error: `The ${plan.name} plan covers ${plan.sources} sources.` });
+    }
 
     const { error } = await adminClient()
       .from('brand_sources')
