@@ -22,6 +22,7 @@
     "core:pull": "git subtree pull --prefix=packages/leads-core https://github.com/anomaliaso/anomalia.git leads-core-dist --squash"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.43",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.46.1",
     "ai": "^7.0.87",

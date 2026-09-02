@@ -1,20 +1,35 @@
-import { generateObject, jsonSchema, createGateway } from 'ai';
+import { generateObject, jsonSchema } from 'ai';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { env } from '$env/dynamic/private';
 
 /**
  * L'unico punto che parla col modello.
  *
- * Il modello è una stringa `provider/model` che passa dall'AI Gateway: nessun SDK di provider
- * installato, e cambiarlo è una variabile d'ambiente invece di un refactor.
+ * Passa da OpenRouter, che è compatibile con l'API di OpenAI: il modello è una stringa
+ * `provider/model` e cambiarlo è una variabile d'ambiente invece di un refactor.
  *
- * La chiave si passa ESPLICITAMENTE. L'SDK di suo legge `process.env.AI_GATEWAY_API_KEY`, che in
- * SvelteKit non è dove vivono le variabili: stanno in `$env/dynamic/private`. Lasciarlo cercare da
- * solo produce un "Unauthenticated request to AI Gateway" con la chiave giusta nel `.env` —
- * un'ora di diagnosi per un guasto che non è una chiave sbagliata ma una chiave invisibile.
+ * La chiave si passa ESPLICITAMENTE. Gli SDK leggono `process.env`, che in SvelteKit non è dove
+ * vivono le variabili — stanno in `$env/dynamic/private`. Lasciarlo cercare da solo produce un
+ * "Unauthenticated" con la chiave giusta nel `.env`: un guasto che sembra una chiave sbagliata ed
+ * è una chiave invisibile.
  */
-const DEFAULT_MODEL = 'openai/gpt-4o-mini';
+const DEFAULT_MODEL = 'openai/gpt-5.6-luna';
 
-const gateway = createGateway({ apiKey: env.AI_GATEWAY_API_KEY });
+const openrouter = createOpenAICompatible({
+  name: 'openrouter',
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: env.OPENROUTER_API_KEY,
+  // Senza questo l'SDK non manda `response_format: json_schema` e ripiega su una modalità che il
+  // provider rifiuta: l'errore che si vede è un generico "Provider returned error", mentre la
+  // stessa richiesta fatta a mano funziona. Va dichiarato, non è dedotto dal baseURL.
+  supportsStructuredOutputs: true,
+  headers: {
+    // OpenRouter attribuisce il traffico a questi due: senza, le chiamate restano anonime nel
+    // cruscotto e non si capisce quale prodotto ha speso cosa.
+    'HTTP-Referer': env.PUBLIC_APP_URL || 'https://dazero.co',
+    'X-Title': 'anomalia-leads'
+  }
+});
 
 /**
  * In structured output OpenAI rifiuta ogni oggetto che non dichiari `additionalProperties: false`.
@@ -37,10 +52,13 @@ export async function aiObject<T>(opts: {
   schema: Record<string, unknown>;
   prompt: string;
   system?: string;
+  /** Il modello per QUESTO lavoro: giudicare quaranta conversazioni e scrivere una bozza non
+   *  sono lo stesso compito, e non devono essere costretti allo stesso modello. */
+  model?: string;
 }): Promise<T | null> {
   try {
     const { object } = await generateObject({
-      model: gateway(env.LEADS_MODEL || DEFAULT_MODEL),
+      model: openrouter(opts.model || env.LEADS_MODEL || DEFAULT_MODEL),
       schema: jsonSchema<T>(strict(opts.schema) as never),
       system: opts.system,
       prompt: opts.prompt
