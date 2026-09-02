@@ -46,6 +46,29 @@ ${plans}
 
 Thirty-day guarantee: a month without a single conversation worth answering is not billed.
 
+## For agents
+
+Once a human has signed up and generated a brand API key from the dashboard's **API** tab, an
+agent can run the whole loop — sources, scan, queue, act — on its own, with no browser involved
+after that one step.
+
+REST, base \`${origin}/api/v1\`, header \`Authorization: Bearer alk_...\` on every request:
+
+- \`GET /queue\` — drafts ready to paste, ranked by buying intent.
+- \`GET /status\` — the last scan's outcome (distinguishes "nothing today" from "every source is broken").
+- \`PATCH /leads/:id\` \`{ "action": "done" | "ignore" }\`
+- \`GET\`/\`POST /sources\`, \`PATCH\`/\`DELETE /sources/:id\`
+- \`POST /scan\` — run the sources → conversations → judgment → drafts pipeline now, instead of
+  waiting for the nightly cron.
+- \`GET\`/\`PUT\`/\`DELETE /webhook\` — \`{ "url": "https://..." }\`. When a scan produces new drafts,
+  this URL gets a signed POST (\`X-Anomalia-Signature: sha256=...\`, HMAC over the raw body with the
+  secret \`PUT\` returns) instead of the agent having to poll.
+
+MCP: \`${origin}/api/mcp\`, same bearer key (\`claude mcp add --transport http anomalia-leads
+${origin}/api/mcp --header "Authorization: Bearer alk_..."\`). One tool per endpoint above:
+\`get_queue\`, \`get_status\`, \`update_lead\`, \`list_sources\`, \`add_source\`, \`set_source_active\`,
+\`remove_source\`, \`trigger_scan\`, \`set_webhook\`, \`remove_webhook\`.
+
 ## Pages
 
 - [Home](${origin}/): what it does, how it works, pricing, FAQ.
