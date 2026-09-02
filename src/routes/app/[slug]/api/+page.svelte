@@ -71,6 +71,14 @@
 			<code class="bg-muted shrink-0 rounded px-2 py-1">PATCH/DELETE /api/v1/sources/:id</code>
 			<span class="text-muted-foreground">pausa/riprendi o rimuovi</span>
 		</div>
+		<div class="flex items-start gap-3">
+			<code class="bg-muted shrink-0 rounded px-2 py-1">POST /api/v1/scan</code>
+			<span class="text-muted-foreground">fa scattare subito il giro, invece di aspettare il cron</span>
+		</div>
+		<div class="flex items-start gap-3">
+			<code class="bg-muted shrink-0 rounded px-2 py-1">GET/PUT/DELETE /api/v1/webhook</code>
+			<span class="text-muted-foreground">{'{ "url": "https://..." }'} — un ping quando lo scan produce bozze</span>
+		</div>
 	</div>
 
 	<pre class="bg-muted mt-6 overflow-x-auto rounded-md px-3 py-3 text-xs">curl {origin}/api/v1/queue \
@@ -85,7 +93,13 @@
 		<code class="bg-muted rounded px-1 py-0.5">list_sources</code>,
 		<code class="bg-muted rounded px-1 py-0.5">add_source</code>,
 		<code class="bg-muted rounded px-1 py-0.5">set_source_active</code>,
-		<code class="bg-muted rounded px-1 py-0.5">remove_source</code>.
+		<code class="bg-muted rounded px-1 py-0.5">remove_source</code>,
+		<code class="bg-muted rounded px-1 py-0.5">trigger_scan</code>,
+		<code class="bg-muted rounded px-1 py-0.5">set_webhook</code>,
+		<code class="bg-muted rounded px-1 py-0.5">remove_webhook</code>. Con questi, un agente parte
+		da una chiave e da zero sorgenti e chiude da solo l'intero giro — aggiunge le sorgenti, fa
+		scattare lo scan, riceve il ping quando ci sono bozze, le legge e le marca fatte o ignorate —
+		senza mai passare da qui.
 	</p>
 	<pre class="bg-muted mt-3 overflow-x-auto rounded-md px-3 py-3 text-xs">claude mcp add --transport http anomalia-leads {origin}/api/mcp \
   --header "Authorization: Bearer alk_..."</pre>

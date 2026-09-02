@@ -19,6 +19,7 @@ import {
 import { scrapeCreatorsGet } from './scrapecreators';
 import { aiObject } from './ai';
 import { planFor } from '$lib/plans';
+import { notifyWebhook } from './webhook';
 
 /**
  * Un giro di scansione per un brand: sorgenti → conversazioni → giudizio → bozze.
@@ -68,6 +69,8 @@ export type Brand = {
   about: string;
   site_url: string | null;
   plan: string;
+  webhook_url?: string | null;
+  webhook_secret?: string | null;
 };
 
 const urlHash = (url: string) => createHash('sha1').update(url).digest('hex').slice(0, 16);
@@ -182,6 +185,17 @@ La rilevanza alta è rara. Chi sfoga non è un lead solo perché nomina il tema.
 
   const drafted = await draftTop(admin, brand, fresh, verdicts, idByHash);
   await logScan(admin, brand.id, refs, fresh.length, verdicts.length, started, failures);
+
+  // Un ping, non il contenuto: chi lo riceve chiama `get_queue` per i dettagli, così il payload
+  // non porta mai le bozze in giro e non c'è uno schema di evento da tenere sincronizzato.
+  if (drafted > 0 && brand.webhook_url && brand.webhook_secret) {
+    await notifyWebhook(brand.webhook_url, brand.webhook_secret, {
+      event: 'leads.ready',
+      brand_id: brand.id,
+      count: drafted,
+      at: new Date().toISOString()
+    });
+  }
 
   return { found: fresh.length, judged: verdicts.length, drafted };
 }

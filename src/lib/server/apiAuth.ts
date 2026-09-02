@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import { adminClient } from '$lib/server/supabase';
 import { hashApiKey } from '$lib/server/apikey';
 
-const BRAND_COLUMNS = 'id, slug, name, about, site_url, plan';
+const BRAND_COLUMNS = 'id, slug, name, about, site_url, plan, webhook_url, webhook_secret';
 
 /**
  * Autentica un brand da `Authorization: Bearer alk_...`. Passa sempre dal service role: una API
