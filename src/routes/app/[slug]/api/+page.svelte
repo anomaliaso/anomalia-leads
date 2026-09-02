@@ -75,4 +75,18 @@
 
 	<pre class="bg-muted mt-6 overflow-x-auto rounded-md px-3 py-3 text-xs">curl {origin}/api/v1/queue \
   -H "Authorization: Bearer alk_..."</pre>
+
+	<h2 class="mt-10 font-medium text-sm">MCP</h2>
+	<p class="text-muted-foreground mt-1 text-sm text-pretty">
+		Stessi dati, come tool per un agente MCP (Claude Code, Claude Desktop, Cursor, ...): un tool
+		per endpoint qui sopra — <code class="bg-muted rounded px-1 py-0.5">get_queue</code>,
+		<code class="bg-muted rounded px-1 py-0.5">get_status</code>,
+		<code class="bg-muted rounded px-1 py-0.5">update_lead</code>,
+		<code class="bg-muted rounded px-1 py-0.5">list_sources</code>,
+		<code class="bg-muted rounded px-1 py-0.5">add_source</code>,
+		<code class="bg-muted rounded px-1 py-0.5">set_source_active</code>,
+		<code class="bg-muted rounded px-1 py-0.5">remove_source</code>.
+	</p>
+	<pre class="bg-muted mt-3 overflow-x-auto rounded-md px-3 py-3 text-xs">claude mcp add --transport http anomalia-leads {origin}/api/mcp \
+  --header "Authorization: Bearer alk_..."</pre>
 </div>

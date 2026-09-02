@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { error, json } from '@sveltejs/kit';
 import { adminClient } from '$lib/server/supabase';
 import { brandFromRequest } from '$lib/server/apiAuth';
-import { markLeadDone, markLeadIgnored } from '$lib/server/leads';
+import { findLeadForBrand, markLeadDone, markLeadIgnored } from '$lib/server/leads';
 
 /**
  * PATCH /api/v1/leads/:id  { "action": "done" | "ignore" }
@@ -17,13 +17,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
   if (action !== 'done' && action !== 'ignore') error(400, 'action must be "done" or "ignore"');
 
   const admin = adminClient();
-  // L'id da solo non autorizza niente: deve appartenere al brand della API key.
-  const { data: lead } = await admin
-    .from('brand_news_items')
-    .select('id, url, author_handle, author_platform, dm_target')
-    .eq('id', params.id)
-    .eq('brand_id', brand.id)
-    .maybeSingle();
+  const lead = await findLeadForBrand(admin, brand.id, params.id);
   if (!lead) error(404, 'lead not found');
 
   const { error: dbError } =
