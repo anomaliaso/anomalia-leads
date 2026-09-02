@@ -7,6 +7,19 @@
  * Solo per i titoli GRANDI: uno script decorativo a 16px non si legge, quindi i titoli delle card
  * restano sul font di sistema.
  */
+/* Machy arriva già in formato web: woff2 a 30 KB contro i 69 dell'OTF, e il woff dietro per i
+   browser che non lo prendono. Il CSS fornito dal produttore punta a file `LUSTRELLA.*` che nel
+   pacchetto non esistono — copiato da un altro font — quindi è riscritto qui. */
+@font-face {
+	font-family: 'Machy';
+	src:
+		url('/fonts/machy.woff2') format('woff2'),
+		url('/fonts/machy.woff') format('woff');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
 @font-face {
 	font-family: 'Magic Hours';
 	src: url('/fonts/magic-hours.otf') format('opentype');
@@ -83,7 +96,7 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
-	--font-display: 'Magic Hours', ui-serif, Georgia, serif;
+	--font-display: 'Machy', 'Magic Hours', ui-serif, Georgia, serif;
 }
 
 @layer base {
