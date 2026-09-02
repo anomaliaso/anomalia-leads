@@ -8,6 +8,7 @@
 	let busy = $state(false);
 </script>
 
+<div class="mx-auto max-w-2xl px-6 py-16">
 <h1 class="text-2xl font-semibold tracking-tight">Cosa vendi?</h1>
 <p class="text-muted-foreground mt-2 text-sm text-pretty">
 	Da qui escono i posti da guardare. Scrivilo come lo spiegheresti a una persona, non come lo
@@ -50,3 +51,4 @@
 		</span>
 	</div>
 </form>
+</div>

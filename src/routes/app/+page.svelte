@@ -38,6 +38,7 @@
 	}
 </script>
 
+<div class="mx-auto max-w-2xl px-6 py-12">
 <header class="flex items-start justify-between gap-4">
 	<div>
 		<h1 class="text-2xl font-semibold tracking-tight">{data.brand.name}</h1>
@@ -135,3 +136,4 @@
 		</li>
 	{/each}
 </ul>
+</div>

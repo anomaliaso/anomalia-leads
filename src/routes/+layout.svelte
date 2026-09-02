@@ -9,6 +9,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="mx-auto min-h-svh max-w-2xl px-6 py-12">
+<!-- Nessuna larghezza imposta qui: la coda vuole una colonna stretta, la landing tutta la pagina. -->
+<div class="min-h-svh">
 	{@render children()}
 </div>
