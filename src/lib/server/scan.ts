@@ -138,14 +138,20 @@ async function freshItems(
   const picked = roundRobin(byOrigin, MAX_ITEMS_PER_SCAN);
   if (!picked.length) return [];
 
+  // La stessa conversazione arriva volentieri da due sorgenti: un crosspost, o una ricerca che
+  // ripesca un thread del subreddit già in lista. In database è un conflitto sull'unique, e in una
+  // insert sola fa fallire TUTTE le righe, non la sua — il giro tornava "40 trovate" e zero in
+  // coda. Si toglie qui, dove il duplicato si vede ancora.
+  const unique = [...new Map(picked.map((p) => [p.hash, p])).values()];
+
   const { data: seen } = await admin
     .from('brand_news_items')
     .select('url_hash')
     .eq('brand_id', brandId)
-    .in('url_hash', picked.map((p) => p.hash));
+    .in('url_hash', unique.map((p) => p.hash));
   const known = new Set((seen ?? []).map((r) => String(r.url_hash)));
 
-  return picked.filter((p) => !known.has(p.hash));
+  return unique.filter((p) => !known.has(p.hash));
 }
 
 /** Un giro completo. Non lancia: torna il conto di cosa è successo. */
@@ -172,7 +178,7 @@ export async function scanBrand(
     return { found: 0, judged: 0, drafted: 0 };
   }
 
-  const { data: inserted } = await admin
+  const { data: inserted, error: insertFailed } = await admin
     .from('brand_news_items')
     .insert(
       fresh.map((i) => ({
@@ -186,6 +192,17 @@ export async function scanBrand(
       }))
     )
     .select('id, url_hash');
+
+  // Questo errore veniva ignorato, ed era il guasto più caro del giro: senza righe non c'è niente
+  // da giudicare, il modello veniva pagato per verdetti su id inesistenti, e la coda diceva
+  // "nessuna conversazione" a chi ne aveva quaranta. Si ferma qui e lo si dichiara.
+  if (insertFailed) {
+    console.warn('[scan] insert conversazioni:', insertFailed.message.slice(0, 300));
+    failures.count++;
+    failures.last = `insert: ${insertFailed.message.slice(0, 300)}`;
+    await logScan(admin, brand.id, refs, fresh.length, 0, started, failures);
+    return { found: fresh.length, judged: 0, drafted: 0 };
+  }
 
   const idByHash = new Map((inserted ?? []).map((r) => [String(r.url_hash), String(r.id)]));
 
