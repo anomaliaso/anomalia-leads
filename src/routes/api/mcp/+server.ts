@@ -7,6 +7,8 @@ import { brandFromRequest } from '$lib/server/apiAuth';
 import { queueForBrand, lastScanForBrand } from '$lib/server/queue';
 import { findLeadForBrand, markLeadDone, markLeadIgnored } from '$lib/server/leads';
 import { SOURCE_KINDS, addSource, listSources, ownedSource, removeSource, setSourceActive } from '$lib/server/sources';
+import { scanBrand, type Brand } from '$lib/server/scan';
+import { clearWebhook, setWebhook } from '$lib/server/webhook';
 
 /**
  * Stessa API REST, vista da un client MCP: ogni tool è un wrapper sottile sugli stessi helper di
@@ -14,7 +16,7 @@ import { SOURCE_KINDS, addSource, listSources, ownedSource, removeSource, setSou
  * chiamata di dominio. Un `McpServer` per richiesta (modalità stateless): niente sessione da
  * tenere in memoria fra una chiamata e l'altra.
  */
-function buildServer(brand: { id: string }) {
+function buildServer(brand: Brand) {
   const server = new McpServer({ name: 'anomalia-leads', version: '1.0.0' });
   const admin = adminClient();
   const text = (value: unknown) => ({ content: [{ type: 'text' as const, text: JSON.stringify(value) }] });
@@ -90,6 +92,38 @@ function buildServer(brand: { id: string }) {
       return text({ ok: true });
     }
   );
+
+  server.registerTool(
+    'trigger_scan',
+    {
+      title: 'Scan now',
+      description:
+        'Fa scattare subito il giro sorgenti → conversazioni → giudizio → bozze, invece di aspettare il cron notturno. Se configurato, il webhook avvisa quando finisce.'
+    },
+    async () => text(await scanBrand(admin, brand))
+  );
+
+  server.registerTool(
+    'set_webhook',
+    {
+      title: 'Set the webhook',
+      description:
+        'Configura l\'URL che riceve un ping POST (firmato HMAC-SHA256, header X-Anomalia-Signature) quando uno scan produce nuove bozze. Ritorna il segreto per verificare la firma.',
+      inputSchema: { url: z.string().url() }
+    },
+    async ({ url }) => {
+      try {
+        return text(await setWebhook(admin, brand.id, url, brand.webhook_secret));
+      } catch (err) {
+        return fail((err as Error).message);
+      }
+    }
+  );
+
+  server.registerTool('remove_webhook', { title: 'Remove the webhook', description: 'Disattiva il ping.' }, async () => {
+    await clearWebhook(admin, brand.id);
+    return text({ ok: true });
+  });
 
   return server;
 }
