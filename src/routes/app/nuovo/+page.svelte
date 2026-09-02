@@ -4,33 +4,25 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Textarea } from '$lib/components/ui/textarea';
 
-	let { form } = $props();
+	let { data, form } = $props();
 	let busy = $state(false);
 
-	// Dire cosa sta per succedere toglie l'ansia dei sette secondi di attesa, e insegna il
-	// prodotto: le sorgenti non le scegli tu, escono da quello che scrivi.
-	const STEPS = [
-		'Da quello che scrivi deduciamo dove ne parlano i tuoi compratori',
-		'Guardiamo quelle conversazioni subito, non al prossimo giro',
-		'Quelle che valgono te le mettiamo in coda con la risposta pronta'
-	];
+	const first = $derived(!data.brands.length);
 </script>
 
-<div class="mx-auto max-w-xl px-6 py-16">
-	<h1 class="text-2xl font-semibold tracking-tight">Cosa vendi?</h1>
+<div class="mx-auto max-w-xl px-6 py-14">
+	<h1 class="text-2xl font-semibold tracking-tight">
+		{first ? 'Cosa vendi?' : 'Un altro brand'}
+	</h1>
 	<p class="text-muted-foreground mt-2 text-sm text-pretty">
-		Scrivilo come lo spiegheresti a una persona, non come lo scriveresti su una landing page. È
-		l'unica configurazione che ti chiediamo.
+		{#if first}
+			Scrivilo come lo spiegheresti a una persona, non come lo scriveresti su una landing page. È
+			l'unica configurazione che ti chiediamo.
+		{:else}
+			Ogni brand ha le sue sorgenti e la sua coda. Il freno sui contatti resta comune: una persona
+			non viene ricontattata da un tuo secondo brand.
+		{/if}
 	</p>
-
-	<ol class="text-muted-foreground mt-6 space-y-2 text-sm">
-		{#each STEPS as step, i (step)}
-			<li class="flex gap-3">
-				<span class="text-muted-foreground/60 font-mono text-xs leading-5">{i + 1}</span>
-				<span class="text-pretty">{step}</span>
-			</li>
-		{/each}
-	</ol>
 
 	<form
 		method="POST"

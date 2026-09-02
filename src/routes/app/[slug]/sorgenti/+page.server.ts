@@ -25,10 +25,14 @@ async function owned(locals: App.Locals, id: string) {
 }
 
 export const actions: Actions = {
-  add: async ({ request, locals }) => {
-    // Le azioni non hanno `parent()`: il brand si rilegge, e passando dal client dell'utente è
-    // RLS a garantire che sia il suo.
-    const { data: brand } = await locals.supabase.from('brands').select('id').limit(1).maybeSingle();
+  add: async ({ request, locals, params }) => {
+    // Le azioni non hanno `parent()`: il brand si rilegge DALLO SLUG, non "il primo". Con più
+    // brand, un `.limit(1)` avrebbe scritto la sorgente in quello sbagliato.
+    const { data: brand } = await locals.supabase
+      .from('brands')
+      .select('id')
+      .eq('slug', params.slug)
+      .maybeSingle();
     if (!brand) return fail(404, { error: 'brand non trovato' });
 
     const form = await request.formData();
