@@ -1,4 +1,10 @@
-# anomalia-leads
+<p align="center">
+  <img src="static/favicon.svg" width="72" alt="anomalia/leads" />
+</p>
+
+<h1 align="center">anomalia-leads</h1>
+
+![anomalia/leads — someone is already looking for what you sell](static/og.png)
 
 Trova le conversazioni in cui il tuo prodotto ha davvero qualcosa da dire — su Reddit, Threads,
 X e LinkedIn — le ordina per intenzione d'acquisto, e ti prepara la risposta da incollare.
