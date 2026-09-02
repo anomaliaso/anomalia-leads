@@ -80,6 +80,17 @@ export function checkoutSession(params: {
     // capire di chi è una subscription orfana, la risposta è dentro l'oggetto sbagliato.
     'subscription_data[metadata][user_id]': params.userId,
     allow_promotion_codes: true,
+    // I prezzi sono IVA inclusa (`tax_behavior: inclusive` sui price): il totale non cambia col
+    // paese, cambia quanto di quel totale è imposta. Senza `automatic_tax` sarebbe solo
+    // un'etichetta — l'imposta non verrebbe né calcolata né riportata in fattura.
+    'automatic_tax[enabled]': true,
+    // Stripe Tax ha bisogno di sapere dove sta il cliente, e il customer esiste già: senza questi
+    // due il checkout si rifiuta di partire invece di indovinare il paese.
+    billing_address_collection: 'required',
+    'customer_update[address]': 'auto',
+    'customer_update[name]': 'auto',
+    // La partita IVA di chi compra da azienda: in UE è quella che sposta l'imposta sul cliente.
+    'tax_id_collection[enabled]': true,
     success_url: params.successUrl,
     cancel_url: params.cancelUrl
   });

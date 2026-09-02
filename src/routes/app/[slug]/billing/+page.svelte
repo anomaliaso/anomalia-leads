@@ -124,6 +124,7 @@
 						</span>
 						<span class="text-muted-foreground text-sm">per month</span>
 					</p>
+					<p class="text-muted-foreground text-xs">tax included</p>
 				</Card.Header>
 
 				<Card.Content class="flex-1">
