@@ -20,7 +20,7 @@
 </header>
 
 <article class="mx-auto max-w-2xl px-6 py-16">
-	<h1 class="font-display text-3xl">Terms of Service</h1>
+	<h1 class="font-semibold tracking-tight text-3xl">Terms of Service</h1>
 	<p class="text-muted-foreground mt-2 text-sm">Last updated 2 September 2026.</p>
 
 	<div class="mt-10 space-y-10 text-sm leading-relaxed">
