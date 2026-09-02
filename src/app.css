@@ -99,9 +99,6 @@
 	.font-display {
 		font-family: var(--font-display);
 		font-weight: 400;
-		/* I titoli di display portano l'accento. Sta solo sui corpi grandi (2xl in su), dove il
-		   contrasto richiesto è più basso: lo stesso corallo su un testo da 14px non basterebbe. */
-		color: var(--primary);
 		/* Il font ha UN SOLO peso. Con `font-semibold` addosso il browser lo ingrossa da sé e i
 		   glifi si impastano: meglio niente grassetto che un grassetto finto. */
 		font-synthesis-weight: none;
