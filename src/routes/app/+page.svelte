@@ -53,15 +53,36 @@
 </header>
 
 {#if !data.leads.length}
-	<Card.Root class="mt-10">
-		<Card.Header>
-			<Card.Title class="text-base">Niente in coda</Card.Title>
-			<Card.Description class="text-pretty">
-				Il silenzio è una risposta valida: vuol dire che oggi non c'era un thread in cui valesse la
-				pena entrare. Un commento inutile costa più di un commento mancato.
-			</Card.Description>
-		</Card.Header>
-	</Card.Root>
+	{#if data.scan?.broken}
+		<!-- Se ogni sorgente è fallita, dire "il silenzio è una risposta" sarebbe una bugia. -->
+		<Card.Root class="border-destructive/40 mt-10">
+			<Card.Header>
+				<Card.Title class="text-base">La scansione non è riuscita</Card.Title>
+				<Card.Description class="text-pretty">
+					L'ultimo giro non ha portato niente e {data.scan.failed}
+					{data.scan.failed === 1 ? 'sorgente ha' : 'sorgenti hanno'} dato errore su {data.scan.total}:
+					questa coda è vuota per un guasto, non perché non ci fosse niente da dire.
+				</Card.Description>
+			</Card.Header>
+			{#if data.scan.error}
+				<Card.Content>
+					<p class="bg-muted text-muted-foreground rounded-md p-3 font-mono text-xs break-all">
+						{data.scan.error}
+					</p>
+				</Card.Content>
+			{/if}
+		</Card.Root>
+	{:else}
+		<Card.Root class="mt-10">
+			<Card.Header>
+				<Card.Title class="text-base">Niente in coda</Card.Title>
+				<Card.Description class="text-pretty">
+					Il silenzio è una risposta valida: vuol dire che oggi non c'era un thread in cui valesse la
+					pena entrare. Un commento inutile costa più di un commento mancato.
+				</Card.Description>
+			</Card.Header>
+		</Card.Root>
+	{/if}
 {/if}
 
 <ul class="mt-8 flex flex-col gap-4">

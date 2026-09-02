@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import { adminClient } from '$lib/server/supabase';
-import { seedSources } from '$lib/server/seed';
+import { proposeSources, saveSources } from '$lib/server/seed';
 import { scanBrand, type Brand } from '$lib/server/scan';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -27,6 +27,13 @@ export const actions: Actions = {
     }
 
     const admin = adminClient();
+
+    // Le sorgenti PRIMA del brand: se il modello non ne trova, non resta niente in database.
+    const proposed = await proposeSources(about);
+    if (!proposed.length) {
+      return fail(502, { error: 'Non sono riuscito a dedurre delle sorgenti. Riprova con una descrizione più concreta.', name, about });
+    }
+
     const { data: brand, error } = await admin
       .from('brands')
       .insert({
@@ -41,11 +48,7 @@ export const actions: Actions = {
 
     if (error || !brand) return fail(500, { error: error?.message ?? 'creazione fallita', name, about });
 
-    // Le sorgenti escono dalla descrizione: è l'unico passo di configurazione che esiste.
-    const seeded = await seedSources(admin, brand.id, about);
-    if (!seeded) {
-      return fail(502, { error: 'Non sono riuscito a dedurre delle sorgenti. Riprova con una descrizione più concreta.', name, about });
-    }
+    await saveSources(admin, brand.id, proposed);
 
     // Prima scansione subito: il valore si vede adesso, non al prossimo cron.
     await scanBrand(admin, brand as Brand).catch((e) => {

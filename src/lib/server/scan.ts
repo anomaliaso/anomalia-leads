@@ -80,14 +80,25 @@ async function loadSources(admin: SupabaseClient, brandId: string): Promise<Sour
   return (data ?? []).map((s) => ({ kind: String(s.kind), value: String(s.value), lang: s.lang as string | null }));
 }
 
+export type Failures = { count: number; last: string | null };
+
 /** Le conversazioni mai viste per questo brand, a quote eque fra le sorgenti. */
-async function freshItems(admin: SupabaseClient, brandId: string, refs: SourceRef[]) {
+async function freshItems(
+  admin: SupabaseClient,
+  brandId: string,
+  refs: SourceRef[],
+  failures: Failures
+) {
   const byOrigin = new Map<string, Array<FeedItem & { hash: string }>>();
 
   for (const ref of refs) {
     const items = await sources.fetchSourceFeed(ref).catch((e) => {
-      // L'errore di UNA sorgente non ferma il giro, ma non diventa nemmeno un silenzioso "0".
-      console.warn(`[scan] sorgente ${ref.kind}:${ref.value}:`, e instanceof Error ? e.message.slice(0, 160) : e);
+      // L'errore di UNA sorgente non ferma il giro, ma non diventa nemmeno un silenzioso "0":
+      // viene contato, perché "nessuna conversazione" e "tutto rotto" non sono la stessa cosa.
+      const message = e instanceof Error ? e.message.slice(0, 300) : String(e);
+      console.warn(`[scan] sorgente ${ref.kind}:${ref.value}:`, message);
+      failures.count++;
+      failures.last = message;
       return [] as FeedItem[];
     });
     if (items.length) {
@@ -114,12 +125,13 @@ export async function scanBrand(
   brand: Brand
 ): Promise<{ found: number; judged: number; drafted: number }> {
   const started = Date.now();
+  const failures: Failures = { count: 0, last: null };
   const refs = await loadSources(admin, brand.id);
   if (!refs.length) return { found: 0, judged: 0, drafted: 0 };
 
-  const fresh = await freshItems(admin, brand.id, refs);
+  const fresh = await freshItems(admin, brand.id, refs, failures);
   if (!fresh.length) {
-    await logScan(admin, brand.id, refs, 0, 0, started);
+    await logScan(admin, brand.id, refs, 0, 0, started, failures);
     return { found: 0, judged: 0, drafted: 0 };
   }
 
@@ -168,7 +180,7 @@ La rilevanza alta è rara. Chi sfoga non è un lead solo perché nomina il tema.
   }
 
   const drafted = await draftTop(admin, brand, fresh, verdicts, idByHash);
-  await logScan(admin, brand.id, refs, fresh.length, verdicts.length, started);
+  await logScan(admin, brand.id, refs, fresh.length, verdicts.length, started, failures);
 
   return { found: fresh.length, judged: verdicts.length, drafted };
 }
@@ -260,7 +272,8 @@ async function logScan(
   refs: SourceRef[],
   found: number,
   relevant: number,
-  started: number
+  started: number,
+  failures: Failures
 ) {
   await admin.from('radar_searches').insert({
     brand_id: brandId,
@@ -268,6 +281,8 @@ async function logScan(
     items_found: found,
     items_fresh: found,
     items_relevant: relevant,
+    sources_failed: failures.count,
+    last_error: failures.last,
     ms: Date.now() - started
   });
 }

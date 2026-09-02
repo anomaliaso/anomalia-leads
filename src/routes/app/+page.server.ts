@@ -27,7 +27,27 @@ export const load: PageServerLoad = async ({ locals }) => {
       Date.parse(b.created_at) - Date.parse(a.created_at)
   );
 
-  return { brand, leads: queue };
+  // L'ultima scansione serve a NON mentire quando la coda è vuota: "oggi non c'era niente" e
+  // "ogni sorgente ha fallito" si somigliano soltanto.
+  const { data: scan } = await locals.supabase
+    .from('radar_searches')
+    .select('sources_failed, last_error, items_found, created_at, sources')
+    .eq('brand_id', brand.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const total = Array.isArray(scan?.sources) ? scan.sources.length : 0;
+  // Non "tutte fallite": `leads-core` inghiotte l'errore dei subreddit perché ha un ripiego RSS,
+  // quindi da qui se ne vedono solo alcune. Il segnale onesto è un altro — se il giro non ha
+  // portato NIENTE e almeno una sorgente ha dato errore, quel vuoto non è silenzio.
+  const broken = Boolean(scan && scan.sources_failed > 0 && scan.items_found === 0);
+
+  return {
+    brand,
+    leads: queue,
+    scan: scan ? { broken, failed: scan.sources_failed, total, error: scan.last_error } : null
+  };
 };
 
 /** Legge il lead solo se è del brand di chi chiede: l'id da solo non autorizza niente. */

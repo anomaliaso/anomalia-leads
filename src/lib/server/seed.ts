@@ -7,6 +7,10 @@ import { aiObject } from './ai';
  * È l'unico passo di onboarding che esiste: l'utente scrive cosa vende, e da lì escono i
  * subreddit e le ricerche da guardare. Chiedergli di scegliere i subreddit a mano sarebbe
  * chiedergli di sapere già la risposta.
+ *
+ * Proposta e scrittura sono separate di proposito: il brand non va creato finché non sappiamo di
+ * avere delle sorgenti, altrimenti un fallimento del modello lascia in database un brand vuoto
+ * che nessuna schermata sa mostrare.
  */
 const SOURCES_SCHEMA = {
   type: 'object',
@@ -27,13 +31,12 @@ const SOURCES_SCHEMA = {
 
 type SeededSources = { subreddits: string[]; reddit_queries: string[] };
 
+export type ProposedSource = { kind: 'subreddit' | 'reddit_query'; value: string };
+
 export const MAX_SOURCES_FREE = 8;
 
-export async function seedSources(
-  admin: SupabaseClient,
-  brandId: string,
-  about: string
-): Promise<number> {
+/** Le sorgenti che il modello propone. Nessuna scrittura: si può fallire senza lasciare tracce. */
+export async function proposeSources(about: string): Promise<ProposedSource[]> {
   const seeded = await aiObject<SeededSources>({
     schema: SOURCES_SCHEMA as unknown as Record<string, unknown>,
     system: 'You set up social listening for a product. You know which communities actually exist and which ones are dead.',
@@ -42,25 +45,32 @@ export async function seedSources(
 Trova dove ne parlano le persone che POTREBBERO COMPRARLO — non dove si parla del tema in astratto.
 Un subreddit enorme e generico produce rumore; uno specifico produce lead.`
   });
-  if (!seeded) return 0;
+  if (!seeded) return [];
 
-  const rows = [
-    ...(seeded.subreddits ?? []).map((s) => ({ kind: 'subreddit', value: String(s).replace(/^r\//, '').trim() })),
-    ...(seeded.reddit_queries ?? []).map((q) => ({ kind: 'reddit_query', value: String(q).trim() }))
+  return [
+    ...(seeded.subreddits ?? []).map((s) => ({ kind: 'subreddit' as const, value: String(s).replace(/^r\//, '').trim() })),
+    ...(seeded.reddit_queries ?? []).map((q) => ({ kind: 'reddit_query' as const, value: String(q).trim() }))
   ]
     .filter((r) => r.value)
-    .slice(0, MAX_SOURCES_FREE)
-    .map((r) => ({ ...r, brand_id: brandId }));
+    .slice(0, MAX_SOURCES_FREE);
+}
 
-  if (!rows.length) return 0;
+export async function saveSources(
+  admin: SupabaseClient,
+  brandId: string,
+  sources: ProposedSource[]
+): Promise<number> {
+  if (!sources.length) return 0;
 
-  const { error } = await admin.from('brand_sources').upsert(rows, {
-    onConflict: 'brand_id,kind,value',
-    ignoreDuplicates: true
-  });
+  const { error } = await admin
+    .from('brand_sources')
+    .upsert(sources.map((s) => ({ ...s, brand_id: brandId })), {
+      onConflict: 'brand_id,kind,value',
+      ignoreDuplicates: true
+    });
   if (error) {
     console.warn('[seed] upsert sorgenti:', error.message.slice(0, 120));
     return 0;
   }
-  return rows.length;
+  return sources.length;
 }
