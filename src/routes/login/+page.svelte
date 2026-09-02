@@ -7,7 +7,7 @@
 	let { form } = $props();
 </script>
 
-<div class="mx-auto flex min-h-svh max-w-md items-center px-6 py-12">
+<div class="mx-auto flex min-h-svh max-w-lg items-center px-6 py-12">
 	<Card.Root class="w-full">
 		<Card.Header>
 			<Card.Title>Entra</Card.Title>

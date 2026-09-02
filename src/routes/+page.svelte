@@ -45,20 +45,20 @@
 	/>
 </svelte:head>
 
-<header class="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
+<header class="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
 	<span class="font-medium tracking-tight">anomalia<span class="text-muted-foreground">/leads</span></span>
 	<Button href="/login" variant="ghost" size="sm">Entra</Button>
 </header>
 
 <!-- Hero -->
-<section class="mx-auto max-w-5xl px-6 pt-16 pb-24">
+<section class="mx-auto max-w-6xl px-6 pt-16 pb-24">
 	<Badge variant="outline" class="mb-6">Reddit · Threads · X · LinkedIn</Badge>
 
-	<h1 class="max-w-3xl text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
+	<h1 class="max-w-4xl text-5xl font-semibold tracking-tight text-balance sm:text-6xl">
 		C'è già chi sta cercando quello che vendi
 	</h1>
 
-	<p class="text-muted-foreground mt-6 max-w-xl text-lg text-pretty">
+	<p class="text-muted-foreground mt-6 max-w-2xl text-lg text-pretty">
 		Lo scrive in un thread, oggi, e tu non lo vedi. Noi lo troviamo, ti diciamo quanto è vicino a
 		comprare, e ti diamo la risposta già scritta per quella conversazione.
 	</p>
@@ -71,14 +71,14 @@
 
 <!-- L'artefatto: è la cosa più convincente che abbiamo, quindi si vede subito -->
 <section class="border-border bg-muted/30 border-y">
-	<div class="mx-auto max-w-5xl px-6 py-20">
+	<div class="mx-auto max-w-6xl px-6 py-20">
 		<h2 class="text-2xl font-semibold tracking-tight">Questo è quello che ricevi</h2>
-		<p class="text-muted-foreground mt-2 max-w-xl text-pretty">
+		<p class="text-muted-foreground mt-2 max-w-2xl text-pretty">
 			Non un avviso che qualcuno ha nominato una parola. Una conversazione, un giudizio su chi la
 			scrive, e il commento pronto.
 		</p>
 
-		<Card.Root class="mt-8 max-w-2xl">
+		<Card.Root class="mt-8 max-w-3xl">
 			<Card.Header>
 				<div class="flex flex-wrap items-center gap-2">
 					<Badge>cerca adesso</Badge>
@@ -106,7 +106,7 @@
 </section>
 
 <!-- Come funziona -->
-<section class="mx-auto max-w-5xl px-6 py-20">
+<section class="mx-auto max-w-6xl px-6 py-20">
 	<h2 class="text-2xl font-semibold tracking-tight">Come funziona</h2>
 	<ol class="mt-8 grid gap-8 sm:grid-cols-2">
 		{#each STEPS as s (s.n)}
@@ -121,7 +121,7 @@
 
 <!-- I principi: sono differenziatori veri, non slogan -->
 <section class="border-border border-t">
-	<div class="mx-auto max-w-5xl px-6 py-20">
+	<div class="mx-auto max-w-6xl px-6 py-20">
 		<h2 class="text-2xl font-semibold tracking-tight">Quattro scelte che ci distinguono</h2>
 		<div class="mt-8 grid gap-6 sm:grid-cols-2">
 			<Card.Root>
@@ -166,7 +166,7 @@
 
 <!-- Prezzi -->
 <section class="border-border bg-muted/30 border-t">
-	<div class="mx-auto max-w-5xl px-6 py-20">
+	<div class="mx-auto max-w-6xl px-6 py-20">
 		<h2 class="text-2xl font-semibold tracking-tight">Prezzi</h2>
 		<p class="text-muted-foreground mt-2 text-sm">
 			Si paga per quante conversazioni guardi e quante bozze ricevi. Non per utenti.
@@ -200,7 +200,7 @@
 
 <!-- Domande -->
 <section class="border-border border-t">
-	<div class="mx-auto max-w-3xl px-6 py-20">
+	<div class="mx-auto max-w-4xl px-6 py-20">
 		<h2 class="text-2xl font-semibold tracking-tight">Domande</h2>
 		<div class="divide-border mt-8 divide-y">
 			{#each FAQ as f (f.q)}
@@ -219,7 +219,7 @@
 
 <!-- Chiusura -->
 <section class="border-border border-t">
-	<div class="mx-auto max-w-5xl px-6 py-24 text-center">
+	<div class="mx-auto max-w-6xl px-6 py-24 text-center">
 		<h2 class="text-3xl font-semibold tracking-tight text-balance">
 			La conversazione che ti serve è già aperta
 		</h2>
@@ -233,7 +233,7 @@
 
 <footer class="border-border border-t">
 	<div
-		class="text-muted-foreground mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-6 py-8 text-xs"
+		class="text-muted-foreground mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-8 text-xs"
 	>
 		<span>anomalia/leads</span>
 		<span>

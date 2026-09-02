@@ -10,7 +10,7 @@
 	const first = $derived(!data.brands.length);
 </script>
 
-<div class="mx-auto max-w-xl px-6 py-14">
+<div class="mx-auto max-w-2xl px-6 py-14">
 	<h1 class="text-2xl font-semibold tracking-tight">
 		{first ? 'Cosa vendi?' : 'Un altro brand'}
 	</h1>

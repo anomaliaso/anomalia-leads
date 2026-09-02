@@ -19,7 +19,7 @@
 	const active = $derived(data.sources.filter((s) => s.active).length);
 </script>
 
-<div class="mx-auto max-w-2xl px-6 py-10">
+<div class="mx-auto max-w-4xl px-6 py-10">
 	<h1 class="text-xl font-semibold tracking-tight">Sorgenti</h1>
 	<p class="text-muted-foreground mt-1 text-sm text-pretty">
 		I posti che guardiamo per te. {active} attive su {data.sources.length}. Una sorgente specifica

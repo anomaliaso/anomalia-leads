@@ -27,7 +27,7 @@
 </script>
 
 <div class="border-border bg-background/80 sticky top-0 z-10 border-b backdrop-blur">
-	<div class="mx-auto flex max-w-2xl items-center gap-3 px-6 py-3">
+	<div class="mx-auto flex max-w-4xl items-center gap-3 px-6 py-3">
 		{#if data.brands.length}
 			<select
 				value={slug}
