@@ -18,6 +18,7 @@ import {
 } from '@anomalia/leads-core/contact';
 import { scrapeCreatorsGet } from './scrapecreators';
 import { aiObject } from './ai';
+import { planFor } from '$lib/plans';
 
 /**
  * Un giro di scansione per un brand: sorgenti → conversazioni → giudizio → bozze.
@@ -36,8 +37,8 @@ const sources = createSources({
 /** Quante conversazioni si danno in pasto al modello in un giro. Oltre, si paga rumore. */
 const MAX_ITEMS_PER_SCAN = 40;
 
-/** Bozze al giorno per piano. Il cap significa "le migliori N", non "le prime N". */
-const DRAFTS_PER_DAY: Record<string, number> = { free: 3, starter: 10, pro: 30 };
+// I limiti arrivano da `$lib/plans`, che è anche quello che legge la landing: prometterne uno e
+// applicarne un altro è il modo più rapido di perdere il primo cliente.
 
 const VERDICT_SCHEMA = {
   type: 'object',
@@ -193,7 +194,7 @@ async function draftTop(
   verdicts: Verdict[],
   idByHash: Map<string, string>
 ): Promise<number> {
-  const budget = DRAFTS_PER_DAY[brand.plan] ?? DRAFTS_PER_DAY.free;
+  const budget = planFor(brand.plan).draftsPerDay;
   const itemById = new Map(fresh.map((i) => [idByHash.get(i.hash) ?? '', i]));
 
   const top = selectTopComments(

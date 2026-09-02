@@ -33,14 +33,14 @@ export const actions: Actions = {
       .select('id')
       .eq('slug', params.slug)
       .maybeSingle();
-    if (!brand) return fail(404, { error: 'brand non trovato' });
+    if (!brand) return fail(404, { error: 'brand not found' });
 
     const form = await request.formData();
     const kind = String(form.get('kind') ?? '') as Kind;
     const value = String(form.get('value') ?? '').trim().replace(/^r\//, '');
 
-    if (!KINDS.includes(kind)) return fail(400, { error: 'Tipo di sorgente sconosciuto.' });
-    if (!value) return fail(400, { error: 'Serve un valore: un subreddit o delle parole chiave.' });
+    if (!KINDS.includes(kind)) return fail(400, { error: 'Unknown source kind.' });
+    if (!value) return fail(400, { error: 'A value is required: a subreddit or some keywords.' });
 
     const { error } = await adminClient()
       .from('brand_sources')
@@ -53,7 +53,7 @@ export const actions: Actions = {
   toggle: async ({ request, locals }) => {
     const form = await request.formData();
     const id = String(form.get('id') ?? '');
-    if (!(await owned(locals, id))) return fail(404, { error: 'sorgente non trovata' });
+    if (!(await owned(locals, id))) return fail(404, { error: 'source not found' });
 
     const { error } = await adminClient()
       .from('brand_sources')
@@ -67,7 +67,7 @@ export const actions: Actions = {
   remove: async ({ request, locals }) => {
     const form = await request.formData();
     const id = String(form.get('id') ?? '');
-    if (!(await owned(locals, id))) return fail(404, { error: 'sorgente non trovata' });
+    if (!(await owned(locals, id))) return fail(404, { error: 'source not found' });
 
     const { error } = await adminClient().from('brand_sources').delete().eq('id', id);
     if (error) return fail(500, { error: error.message });

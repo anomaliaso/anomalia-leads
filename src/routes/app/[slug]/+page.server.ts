@@ -60,7 +60,7 @@ export const actions: Actions = {
   done: async ({ request, locals }) => {
     const id = String((await request.formData()).get('id') ?? '');
     const lead = await ownedLead(locals, id);
-    if (!lead) return fail(404, { error: 'lead non trovato' });
+    if (!lead) return fail(404, { error: 'lead not found' });
 
     // `done_at` è ciò che `contactGate` guarda: da qui in poi quella persona è stata toccata.
     const { error } = await adminClient()
@@ -74,7 +74,7 @@ export const actions: Actions = {
   ignore: async ({ request, locals }) => {
     const id = String((await request.formData()).get('id') ?? '');
     const lead = await ownedLead(locals, id);
-    if (!lead) return fail(404, { error: 'lead non trovato' });
+    if (!lead) return fail(404, { error: 'lead not found' });
 
     const admin = adminClient();
     const handle = lead.author_handle ?? lead.dm_target;
@@ -84,7 +84,7 @@ export const actions: Actions = {
         platform: lead.author_platform ?? platformOf(String(lead.url ?? '')),
         handle: String(handle),
         source: 'manual',
-        reason: 'ignorato dal proprietario nella coda'
+        reason: 'ignored by the owner in the queue'
       });
     }
 

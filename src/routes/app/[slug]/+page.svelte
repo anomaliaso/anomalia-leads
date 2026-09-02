@@ -13,10 +13,10 @@
 	// L'intenzione è il segnale che ordina la coda: chi compra adesso si vede da lontano, chi
 	// sfoga resta leggibile ma non urla.
 	const INTENT: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
-		seeking_now: { label: 'cerca adesso', variant: 'default' },
-		comparing: { label: 'sta confrontando', variant: 'secondary' },
-		researching: { label: 'si informa', variant: 'outline' },
-		venting: { label: 'sfoga', variant: 'outline' },
+		seeking_now: { label: 'buying now', variant: 'default' },
+		comparing: { label: 'comparing', variant: 'secondary' },
+		researching: { label: 'researching', variant: 'outline' },
+		venting: { label: 'venting', variant: 'outline' },
 		none: { label: '—', variant: 'outline' }
 	};
 
@@ -31,10 +31,10 @@
 	function since(iso: string | null): string {
 		if (!iso) return '';
 		const m = Math.round((Date.now() - Date.parse(iso)) / 60000);
-		if (m < 1) return 'adesso';
-		if (m < 60) return `${m} min fa`;
+		if (m < 1) return 'just now';
+		if (m < 60) return `${m} min ago`;
 		const h = Math.round(m / 60);
-		return h < 24 ? `${h} h fa` : `${Math.round(h / 24)} g fa`;
+		return h < 24 ? `${h} h ago` : `${Math.round(h / 24)} d ago`;
 	}
 
 	async function copy(id: string, text: string) {
@@ -59,19 +59,19 @@
 		<div>
 			<h1 class="text-xl font-semibold tracking-tight">
 				{data.leads.length}
-				{data.leads.length === 1 ? 'conversazione' : 'conversazioni'}
+				{data.leads.length === 1 ? 'conversation' : 'conversations'}
 			</h1>
 			<p class="text-muted-foreground mt-1 text-sm">
 				{#if data.scan?.at}
-					ultima ricerca {since(data.scan.at)}
+					last search {since(data.scan.at)}
 				{:else}
-					nessuna ricerca ancora
+					no search yet
 				{/if}
 			</p>
 		</div>
 
 		<Button variant="outline" size="sm" onclick={scan} disabled={scanning}>
-			{scanning ? 'cerco…' : 'cerca ora'}
+			{scanning ? 'searching…' : 'search now'}
 		</Button>
 	</header>
 
@@ -83,7 +83,7 @@
 					? 'bg-muted text-foreground'
 					: 'text-muted-foreground hover:text-foreground'}"
 			>
-				Tutte {data.leads.length}
+				All {data.leads.length}
 			</button>
 			<button
 				onclick={() => (filter = 'caldi')}
@@ -91,7 +91,7 @@
 					? 'bg-muted text-foreground'
 					: 'text-muted-foreground hover:text-foreground'}"
 			>
-				Chi sta comprando {hotCount}
+				Buying now {hotCount}
 			</button>
 		</div>
 	{/if}
@@ -99,7 +99,7 @@
 	{#if scanning}
 		<Card.Root class="mt-6">
 			<Card.Content class="text-muted-foreground py-6 text-sm">
-				Sto guardando le sorgenti e giudicando quello che trovo. Ci vogliono pochi secondi.
+				Reading the sources and judging what turns up. This takes a few seconds.
 			</Card.Content>
 		</Card.Root>
 	{:else if !data.leads.length}
@@ -108,11 +108,11 @@
 			     risposta" sarebbe una bugia. -->
 			<Card.Root class="border-destructive/40 mt-6">
 				<Card.Header>
-					<Card.Title class="text-base">La ricerca non è riuscita</Card.Title>
+					<Card.Title class="text-base">The search failed</Card.Title>
 					<Card.Description class="text-pretty">
-						L'ultimo giro non ha portato niente e {data.scan.failed}
-						{data.scan.failed === 1 ? 'sorgente ha' : 'sorgenti hanno'} dato errore su {data.scan
-							.total}: questa coda è vuota per un guasto, non perché non ci fosse niente da dire.
+						The last run brought back nothing and {data.scan.failed} of {data.scan.total}
+						{data.scan.failed === 1 ? 'source' : 'sources'} errored: this queue is empty because something
+						broke, not because there was nothing to say.
 					</Card.Description>
 				</Card.Header>
 				{#if data.scan.error}
@@ -126,10 +126,10 @@
 		{:else}
 			<Card.Root class="mt-6">
 				<Card.Header>
-					<Card.Title class="text-base">Niente in coda</Card.Title>
+					<Card.Title class="text-base">Nothing in the queue</Card.Title>
 					<Card.Description class="text-pretty">
-						Il silenzio è una risposta valida: vuol dire che oggi non c'era un thread in cui valesse
-						la pena entrare. Un commento inutile costa più di un commento mancato.
+						Silence is a valid answer: it means there was no thread worth joining today. A useless
+						comment costs more than a missed one.
 					</Card.Description>
 				</Card.Header>
 			</Card.Root>
@@ -146,7 +146,7 @@
 							<Badge variant={intent.variant}>{intent.label}</Badge>
 							<span class="text-muted-foreground text-xs">{lead.source_name}</span>
 							<span class="text-muted-foreground/60 text-xs">·</span>
-							<span class="text-muted-foreground text-xs">rilevanza {lead.relevance}</span>
+							<span class="text-muted-foreground text-xs">relevance {lead.relevance}</span>
 							<span class="text-muted-foreground/60 text-xs">·</span>
 							<span class="text-muted-foreground text-xs">{since(lead.created_at)}</span>
 						</div>
@@ -173,7 +173,7 @@
 								<summary
 									class="text-muted-foreground hover:text-foreground cursor-pointer text-xs select-none"
 								>
-									e un DM, se preferisci in privato
+									and a DM, if you would rather go private
 								</summary>
 								<p class="bg-muted text-foreground mt-2 rounded-md p-4 text-sm whitespace-pre-wrap">
 									{lead.dm_draft}
@@ -185,7 +185,7 @@
 										rel="noreferrer"
 										class="text-muted-foreground hover:text-foreground mt-2 inline-block text-xs underline underline-offset-4"
 									>
-										apri il profilo
+										open the profile
 									</a>
 								{/if}
 							</details>
@@ -194,12 +194,12 @@
 
 					<Card.Footer class="gap-2">
 						<Button size="sm" onclick={() => copy(lead.id, lead.suggestion)}>
-							{copied === lead.id ? 'copiato' : 'copia il commento'}
+							{copied === lead.id ? 'copied' : 'copy the comment'}
 						</Button>
 
 						<form method="POST" action="?/done" use:enhance>
 							<input type="hidden" name="id" value={lead.id} />
-							<Button type="submit" size="sm" variant="outline">l'ho pubblicato</Button>
+							<Button type="submit" size="sm" variant="outline">I posted it</Button>
 						</form>
 
 						<form method="POST" action="?/ignore" use:enhance class="ml-auto">
@@ -210,7 +210,7 @@
 								variant="ghost"
 								class="text-muted-foreground hover:text-destructive"
 							>
-								ignora
+								ignore
 							</Button>
 						</form>
 					</Card.Footer>

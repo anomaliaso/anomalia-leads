@@ -8,11 +8,11 @@
 	let { data, form } = $props();
 
 	const KIND = {
-		subreddit: { label: 'subreddit', hint: 'es. smallbusiness' },
-		reddit_query: { label: 'ricerca Reddit', hint: 'es. crm per idraulici' },
-		threads_query: { label: 'ricerca Threads', hint: 'parole chiave' },
-		linkedin_query: { label: 'ricerca LinkedIn', hint: 'parole chiave' },
-		x_community: { label: 'community X', hint: 'id o url della community' }
+		subreddit: { label: 'subreddit', hint: 'e.g. smallbusiness' },
+		reddit_query: { label: 'Reddit search', hint: 'e.g. crm for plumbers' },
+		threads_query: { label: 'Threads search', hint: 'keywords' },
+		linkedin_query: { label: 'LinkedIn search', hint: 'keywords' },
+		x_community: { label: 'X community', hint: 'community id or url' }
 	} as const;
 
 	let kind = $state<keyof typeof KIND>('subreddit');
@@ -20,10 +20,10 @@
 </script>
 
 <div class="mx-auto max-w-4xl px-6 py-10">
-	<h1 class="text-xl font-semibold tracking-tight">Sorgenti</h1>
+	<h1 class="text-xl font-semibold tracking-tight">Sources</h1>
 	<p class="text-muted-foreground mt-1 text-sm text-pretty">
-		I posti che guardiamo per te. {active} attive su {data.sources.length}. Una sorgente specifica
-		produce lead; una enorme e generica produce rumore.
+		The places we watch for you. {active} active of {data.sources.length}. A specific source produces
+		leads; a huge generic one produces noise.
 	</p>
 
 	<Card.Root class="mt-6">
@@ -40,7 +40,7 @@
 				</select>
 
 				<Input name="value" required placeholder={KIND[kind].hint} class="flex-1" />
-				<Button type="submit">Aggiungi</Button>
+				<Button type="submit">Add</Button>
 			</form>
 
 			{#if form?.error}
@@ -51,7 +51,7 @@
 
 	{#if !data.sources.length}
 		<p class="text-muted-foreground mt-8 text-sm">
-			Nessuna sorgente. Senza, la scansione non ha dove guardare.
+			No sources yet. Without them the search has nowhere to look.
 		</p>
 	{/if}
 
@@ -70,14 +70,14 @@
 					<input type="hidden" name="id" value={s.id} />
 					<input type="hidden" name="active" value={s.active ? 'false' : 'true'} />
 					<Button type="submit" variant="ghost" size="sm" class="text-muted-foreground">
-						{s.active ? 'sospendi' : 'riattiva'}
+						{s.active ? 'pause' : 'resume'}
 					</Button>
 				</form>
 
 				<form method="POST" action="?/remove" use:enhance>
 					<input type="hidden" name="id" value={s.id} />
 					<Button type="submit" variant="ghost" size="sm" class="text-muted-foreground hover:text-destructive">
-						togli
+						remove
 					</Button>
 				</form>
 			</li>

@@ -12,15 +12,15 @@
 
 <div class="mx-auto max-w-2xl px-6 py-14">
 	<h1 class="text-2xl font-semibold tracking-tight">
-		{first ? 'Cosa vendi?' : 'Un altro brand'}
+		{first ? 'What do you sell?' : 'Another brand'}
 	</h1>
 	<p class="text-muted-foreground mt-2 text-sm text-pretty">
 		{#if first}
-			Scrivilo come lo spiegheresti a una persona, non come lo scriveresti su una landing page. È
-			l'unica configurazione che ti chiediamo.
+			Write it the way you would explain it to a person, not the way you would write it on a landing
+			page. It is the only setup we ask for.
 		{:else}
-			Ogni brand ha le sue sorgenti e la sua coda. Il freno sui contatti resta comune: una persona
-			non viene ricontattata da un tuo secondo brand.
+			Each brand has its own sources and its own queue. The contact brake stays shared: a person is
+			never messaged again by a second brand of yours.
 		{/if}
 	</p>
 
@@ -35,17 +35,17 @@
 			};
 		}}
 	>
-		<Input name="name" required placeholder="Nome del prodotto" value={form?.name ?? ''} />
+		<Input name="name" required placeholder="Product name" value={form?.name ?? ''} />
 
 		<Textarea
 			name="about"
 			required
 			rows={5}
 			value={form?.about ?? ''}
-			placeholder="Che problema risolvi, e per chi. Esempio: gestionale per piccoli studi dentistici che elimina il richiamo pazienti a mano."
+			placeholder="What problem you solve, and for whom. Example: scheduling software for small dental practices that removes chasing patients by hand."
 		/>
 
-		<Input name="site_url" type="url" placeholder="https://iltuosito.com (facoltativo)" />
+		<Input name="site_url" type="url" placeholder="https://yoursite.com (optional)" />
 
 		{#if form?.error}
 			<p class="text-destructive text-sm text-pretty">{form.error}</p>
@@ -53,16 +53,16 @@
 
 		<div class="flex items-center gap-3">
 			<Button type="submit" disabled={busy}>
-				{busy ? 'Cerco le conversazioni…' : 'Trova i lead'}
+				{busy ? 'Finding conversations…' : 'Find my leads'}
 			</Button>
 			{#if !busy}
-				<span class="text-muted-foreground text-xs">Ci vogliono pochi secondi.</span>
+				<span class="text-muted-foreground text-xs">Takes a few seconds.</span>
 			{/if}
 		</div>
 
 		{#if busy}
 			<p class="text-muted-foreground text-xs text-pretty">
-				Sto deducendo le sorgenti e facendo la prima ricerca. Non chiudere la pagina.
+				Working out your sources and running the first search. Do not close the page.
 			</p>
 		{/if}
 	</form>

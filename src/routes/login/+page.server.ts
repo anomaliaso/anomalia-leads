@@ -23,7 +23,7 @@ export const actions: Actions = {
 
   signup: async ({ request, locals }) => {
     const { email, password } = credentials(await request.formData());
-    if (password.length < 8) return fail(400, { error: 'La password vuole almeno 8 caratteri.', email });
+    if (password.length < 8) return fail(400, { error: 'The password needs at least 8 characters.', email });
 
     const { error } = await locals.supabase.auth.signUp({ email, password });
     if (error) return fail(400, { error: error.message, email });

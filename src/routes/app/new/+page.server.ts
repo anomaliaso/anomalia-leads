@@ -7,7 +7,7 @@ import { createBrandSlug } from '$lib/brand-slug';
 
 export const actions: Actions = {
   default: async ({ request, locals }) => {
-    if (!locals.user) redirect(303, '/login?next=/app/nuovo');
+    if (!locals.user) redirect(303, '/login?next=/app/new');
 
     const form = await request.formData();
     const name = String(form.get('name') ?? '').trim();
@@ -16,7 +16,7 @@ export const actions: Actions = {
 
     if (!name || about.length < 20) {
       return fail(400, {
-        error: 'Serve un nome e due righe vere su cosa vendi: è da lì che escono le sorgenti.',
+        error: 'We need a name and two real lines about what you sell: that is where the sources come from.',
         name,
         about
       });
@@ -28,7 +28,7 @@ export const actions: Actions = {
     const proposed = await proposeSources(about);
     if (!proposed.length) {
       return fail(502, {
-        error: 'Non sono riuscito a dedurre delle sorgenti. Riprova con una descrizione più concreta.',
+        error: 'I could not work out any sources. Try again with a more concrete description.',
         name,
         about
       });
@@ -46,7 +46,7 @@ export const actions: Actions = {
       .select('id, slug, name, about, site_url, plan')
       .single();
 
-    if (error || !brand) return fail(500, { error: error?.message ?? 'creazione fallita', name, about });
+    if (error || !brand) return fail(500, { error: error?.message ?? 'could not create the brand', name, about });
 
     await saveSources(admin, brand.id, proposed);
 

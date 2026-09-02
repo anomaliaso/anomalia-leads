@@ -10,8 +10,8 @@
 <div class="mx-auto flex min-h-svh max-w-lg items-center px-6 py-12">
 	<Card.Root class="w-full">
 		<Card.Header>
-			<Card.Title>Entra</Card.Title>
-			<Card.Description>Trova le conversazioni dove hai qualcosa da dire.</Card.Description>
+			<Card.Title>Sign in</Card.Title>
+			<Card.Description>Find the conversations where you have something to say.</Card.Description>
 		</Card.Header>
 
 		<Card.Content>
@@ -21,7 +21,7 @@
 					type="email"
 					required
 					autocomplete="email"
-					placeholder="tu@esempio.com"
+					placeholder="you@example.com"
 					value={form?.email ?? ''}
 				/>
 				<Input
@@ -37,8 +37,8 @@
 				{/if}
 
 				<div class="flex gap-2">
-					<Button type="submit" formaction="?/login">Entra</Button>
-					<Button type="submit" formaction="?/signup" variant="outline">Crea un account</Button>
+					<Button type="submit" formaction="?/login">Sign in</Button>
+					<Button type="submit" formaction="?/signup" variant="outline">Create an account</Button>
 				</div>
 			</form>
 		</Card.Content>

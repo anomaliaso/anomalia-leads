@@ -14,7 +14,7 @@ export const load: LayoutServerLoad = async ({ locals, params }) => {
     .eq('slug', params.slug)
     .maybeSingle();
 
-  if (!brand) error(404, 'brand non trovato');
+  if (!brand) error(404, 'brand not found');
 
   return { brand };
 };

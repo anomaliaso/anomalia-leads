@@ -11,8 +11,8 @@
 	const nav = $derived(
 		slug
 			? [
-					{ href: `/app/${slug}`, label: 'Coda', exact: true },
-					{ href: `/app/${slug}/sorgenti`, label: 'Sorgenti', exact: false }
+					{ href: `/app/${slug}`, label: 'Queue', exact: true },
+					{ href: `/app/${slug}/sources`, label: 'Sources', exact: false }
 				]
 			: []
 	);
@@ -22,7 +22,7 @@
 
 	function switchBrand(event: Event) {
 		const value = (event.currentTarget as HTMLSelectElement).value;
-		goto(value === '__nuovo' ? '/app/nuovo' : `/app/${value}`);
+		goto(value === '__new' ? '/app/new' : `/app/${value}`);
 	}
 </script>
 
@@ -38,10 +38,10 @@
 				{#each data.brands as b (b.id)}
 					<option value={b.slug}>{b.name}</option>
 				{/each}
-				<option value="__nuovo">+ nuovo brand</option>
+				<option value="__new">+ new brand</option>
 			</select>
 		{:else}
-			<span class="text-muted-foreground text-sm">nessun brand</span>
+			<span class="text-muted-foreground text-sm">no brand yet</span>
 		{/if}
 
 		<nav class="flex items-center gap-1">
@@ -58,7 +58,7 @@
 		</nav>
 
 		<form method="POST" action="/logout" class="ml-auto">
-			<Button type="submit" variant="ghost" size="sm" class="text-muted-foreground">esci</Button>
+			<Button type="submit" variant="ghost" size="sm" class="text-muted-foreground">sign out</Button>
 		</form>
 	</div>
 </div>

@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { aiObject } from './ai';
+import { planFor } from '$lib/plans';
 
 /**
  * Da una frase a delle sorgenti.
@@ -33,10 +34,8 @@ type SeededSources = { subreddits: string[]; reddit_queries: string[] };
 
 export type ProposedSource = { kind: 'subreddit' | 'reddit_query'; value: string };
 
-export const MAX_SOURCES_FREE = 8;
-
 /** Le sorgenti che il modello propone. Nessuna scrittura: si può fallire senza lasciare tracce. */
-export async function proposeSources(about: string): Promise<ProposedSource[]> {
+export async function proposeSources(about: string, plan = 'free'): Promise<ProposedSource[]> {
   const seeded = await aiObject<SeededSources>({
     schema: SOURCES_SCHEMA as unknown as Record<string, unknown>,
     system: 'You set up social listening for a product. You know which communities actually exist and which ones are dead.',
@@ -52,7 +51,7 @@ Un subreddit enorme e generico produce rumore; uno specifico produce lead.`
     ...(seeded.reddit_queries ?? []).map((q) => ({ kind: 'reddit_query' as const, value: String(q).trim() }))
   ]
     .filter((r) => r.value)
-    .slice(0, MAX_SOURCES_FREE);
+    .slice(0, planFor(plan).sources ?? Infinity);
 }
 
 export async function saveSources(
